@@ -6,7 +6,7 @@
 ;; Keywords: Sage, math, auto-complete
 ;; Created: 2012
 ;; Version: 0.0.1
-;; Package-Requires: ((auto-complete "1.4.0") (sage-shell "0.0.1"))
+;; Package-Requires: ((auto-complete "1.4.0") (sage-shell-mode "0.0.1"))
 
 ;;; License
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,30 +24,30 @@
 
 
 ;;; Installation
-;; 1. Install sage-shell.el. See the comment of sage-shell.el for the installation.
+;; 1. Install sage-shell-mode. See the comment of sage-shell.el for the installation.
 ;; 2. Ensure that auto-complete.el is in your load-path.
 ;; 3. Put this file to your load-path and bytecompile it.
-;; 4. Put the following lines to ~/.emacs.
-;; (setq ac-modes (append '(sage-mode sage-shell-mode) ac-modes))
-;; (add-hook 'sage-shell-mode-hook 'sage-shell-ac:add-sources)
-;; (add-hook 'sage-mode-hook 'sage-edit-ac:add-sources)
+;; 4. Put the following lines to ~/.emacs.d/init.el.
+;; (add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
+;; (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 
 ;;; Code:
 (require 'auto-complete)
-(require 'sage-shell)
+(require 'sage-shell-mode)
 (eval-when-compile (require 'cl))
+
+(setq sage-shell:completion-function 'auto-complete)
 
 
 ;;; sage-shell-ac
 (add-to-list 'ac-modes 'sage-shell-mode)
-(add-hook 'sage-shell-mode-hook 'sage-shell-ac:add-sources)
 
 ;;;###autoload
-(defun sage-shell-ac:add-sources ()
+(defun ac-sage-repl:add-sources ()
   (add-to-list 'ac-sources 'ac-source-sage-shell)
   (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t))
 
-(defvar sage-shell-ac:python-kwds
+(defvar ac-sage-repl:python-kwds
     '("abs" "all" "and" "any" "apply" "as" "assert" "basestring" "bin"
       "bool" "break" "buffer" "bytearray" "callable" "chr" "class"
       "classmethod" "cmp" "coerce" "compile" "complex" "continue" "def"
@@ -63,69 +63,75 @@
       "str" "sum" "super" "try" "tuple" "type" "unichr" "unicode" "vars"
       "while" "with" "xrange" "yield" "zip" "__import__"))
 
-(defun sage-shell-ac:init ()
+(defun ac-sage-repl:init ()
   (when (sage-shell:output-finished-p)
     (sage-shell-cpl:completion-init
      (sage-shell-cpl:get 'interface)
      (sage-shell-cpl:get 'var-base-name)
      (equal this-command 'auto-complete))))
 
-(defun sage-shell-ac:candidates ()
+(defun ac-sage-repl:candidates ()
   (when (and (sage-shell:redirect-finished-p)
              (sage-shell:output-finished-p))
     (let* ((keywords (if (and (not (sage-shell-cpl:get 'var-base-name))
                               (equal (sage-shell-cpl:get 'interface) "sage"))
-                         sage-shell-ac:python-kwds
+                         ac-sage-repl:python-kwds
                        nil)))
       (append keywords (sage-shell-cpl:candidates)))))
 
 (defvar ac-source-sage-shell
-  '((init . sage-shell-ac:init)
+  '((init . ac-sage-repl:init)
     (prefix . sage-shell-cpl:prefix)
-    (candidates . sage-shell-ac:candidates)
+    (candidates . ac-sage-repl:candidates)
     (cache)))
 
 
 ;; sage-edit-ac
-(add-to-list 'ac-modes 'sage-mode)
-(add-hook 'sage-mode-hook 'sage-edit-ac:add-sources)
+(add-to-list 'ac-modes 'sage-shell:sage-mode)
 
 ;;;###autoload
-(defun sage-edit-ac:add-sources ()
+(defun ac-sage:add-sources ()
   (add-to-list 'ac-sources 'ac-source-sage-commands)
   (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t)
   (setq ac-sources
         (delete 'ac-source-words-in-same-mode-buffers ac-sources)))
 
-(defvar sage-edit-ac:sage-commands nil)
-(make-variable-buffer-local 'sage-edit-ac:sage-commands)
+(defvar ac-sage:sage-commands nil)
+(make-variable-buffer-local 'ac-sage:sage-commands)
 
-(defun sage-edit-ac:candidates ()
+(defun ac-sage:candidates ()
   (append
    (and sage-shell:process-buffer
         (and (sage-shell:redirect-finished-p)
              (sage-shell:output-finished-p))
-        (or sage-edit-ac:sage-commands
-            (setq sage-edit-ac:sage-commands
-                  (sage:awhen (get-buffer sage-shell:process-buffer)
+        (or ac-sage:sage-commands
+            (setq ac-sage:sage-commands
+                  (sage-shell:awhen (get-buffer sage-shell:process-buffer)
                     (with-current-buffer it
                       (or (sage-shell-cpl:get-cmd-lst "sage")
                           (sage-shell:update-sage-commands)))))))
-   sage-shell-ac:python-kwds))
+   ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-commands
-  '((init . (lambda () (sage-edit:set-sage-proc-buf-internal nil nil)))
-    (candidates . sage-edit-ac:candidates)
+  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
+    (candidates . ac-sage:candidates)
     (cache)))
 
-(defun sage-edit-ac:words-in-sage-buffers ()
+(defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
    (lambda (buf)
-     (sage:in (buffer-local-value 'major-mode buf) sage:sage-modes))))
+     (sage-shell:in (buffer-local-value 'major-mode buf) sage-shell:sage-modes))))
 
 (defvar ac-source-words-in-sage-buffers
   '((init . ac-update-word-index)
-    (candidates . sage-edit-ac:words-in-sage-buffers)))
+    (candidates . ac-sage:words-in-sage-buffers)))
+
+(defun ac-sage-setup ()
+  (cond
+   ((eq major-mode 'sage-shell-mode)
+    (ac-sage-repl:add-sources))
+   ((eq major-mode 'sage-shell:sage-mode)
+    (ac-sage:add-sources))))
 
 (provide 'auto-complete-sage)
 ;;; auto-complete-sage.el ends here
