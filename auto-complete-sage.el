@@ -23,11 +23,8 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-;;; Installation
-;; 1. Install sage-shell-mode. See the comment of sage-shell.el for the installation.
-;; 2. Ensure that auto-complete.el is in your load-path.
-;; 3. Put this file to your load-path and bytecompile it.
-;; 4. Put the following lines to ~/.emacs.d/init.el.
+;;; Setting
+;; Put the following lines to ~/.emacs.d/init.el.
 ;; (add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
 ;; (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 
