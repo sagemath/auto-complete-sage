@@ -22,11 +22,6 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-;;; Setting
-;; Put the following lines to ~/.emacs.d/init.el.
-;; (add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
-;; (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
-
 ;;; Code:
 (require 'auto-complete)
 (require 'sage-shell-mode)
@@ -38,7 +33,6 @@
 ;;; sage-shell-ac
 (add-to-list 'ac-modes 'sage-shell-mode)
 
-;;;###autoload
 (defun ac-sage-repl:add-sources ()
   (add-to-list 'ac-sources 'ac-source-sage-shell)
   (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t))
@@ -85,7 +79,6 @@
 ;; sage-edit-ac
 (add-to-list 'ac-modes 'sage-shell:sage-mode)
 
-;;;###autoload
 (defun ac-sage:add-sources ()
   (add-to-list 'ac-sources 'ac-source-sage-commands)
   (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t)
@@ -122,12 +115,18 @@
   '((init . ac-update-word-index)
     (candidates . ac-sage:words-in-sage-buffers)))
 
+;;;###autoload
 (defun ac-sage-setup ()
   (cond
    ((eq major-mode 'sage-shell-mode)
     (ac-sage-repl:add-sources))
    ((eq major-mode 'sage-shell:sage-mode)
     (ac-sage:add-sources))))
+
+;;;###autoload
+(add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
+;;;###autoload
+(add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 
 (provide 'auto-complete-sage)
 ;;; auto-complete-sage.el ends here
