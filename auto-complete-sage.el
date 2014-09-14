@@ -25,7 +25,6 @@
 ;;; Code:
 (require 'auto-complete)
 (require 'sage-shell-mode)
-(eval-when-compile (require 'cl))
 
 (setq sage-shell:completion-function 'auto-complete)
 
