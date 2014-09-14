@@ -21,6 +21,10 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Setting:
+;; Put the following lines to ~/.emacs.d/init.el.
+;; (add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
+;; (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 
 ;;; Code:
 (require 'auto-complete)
@@ -114,17 +118,13 @@
   '((init . ac-update-word-index)
     (candidates . ac-sage:words-in-sage-buffers)))
 
+;;;###autoload
 (defun ac-sage-setup ()
   (cond
    ((eq major-mode 'sage-shell-mode)
     (ac-sage-repl:add-sources))
    ((eq major-mode 'sage-shell:sage-mode)
     (ac-sage:add-sources))))
-
-;;;###autoload
-(add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
-;;;###autoload
-(add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 
 (provide 'auto-complete-sage)
 ;;; auto-complete-sage.el ends here
