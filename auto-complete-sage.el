@@ -120,6 +120,7 @@
 
 ;;;###autoload
 (defun ac-sage-setup ()
+  (interactive)
   (cond
    ((eq major-mode 'sage-shell-mode)
     (ac-sage-repl:add-sources))
