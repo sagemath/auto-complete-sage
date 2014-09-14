@@ -114,7 +114,6 @@
   '((init . ac-update-word-index)
     (candidates . ac-sage:words-in-sage-buffers)))
 
-;;;###autoload
 (defun ac-sage-setup ()
   (cond
    ((eq major-mode 'sage-shell-mode)
