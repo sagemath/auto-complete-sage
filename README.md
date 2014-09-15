@@ -1,6 +1,6 @@
 # Overview
 
-An [auto-complete](https://github.com/stakemori/auto-complete-sage)
+`auto-complete-sage` provides an [auto-complete](https://github.com/auto-complete/auto-complete)
  source for [sage-shell-mode](https://github.com/stakemori/sage-shell-mode).
 
 ![ac-sage](images/ac-sage.gif)
