@@ -6,9 +6,13 @@
 ![ac-sage](images/ac-sage.gif)
 
 # Installation
-You will be able to install `auto-complete-sage` from
+You can install `auto-complete-sage` from
 [MELPA](https://github.com/milkypostman/melpa.git) by package.el
 (`M-x package-install auto-complete-sage`).
+
+For the setting of [auto-complete](https://github.com/auto-complete/auto-complete),
+see the [manual](http://cx4a.org/software/auto-complete/manual.html)
+of `auto-complete-mode`.
 
 To add sources to `ac-sources`, put the following lines to `"~/.emacs.d/init.el"`:
 ```lisp
