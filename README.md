@@ -23,6 +23,17 @@ To add these sources to `ac-sources`, put the following lines to `"~/.emacs.d/in
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 ```
 
+# Tab Completion
+`auto-complete-sage` replaces the default completion function of
+`sage-shell-mode` (`completion-at-point`) by `auto-complete`.
+If you want to use `completion-at-point` for the Tab completion,
+put the following line to `"~/.emacs.d/init.el"`:
+
+```
+(setq sage-shell:completion-function 'completion-at-point)
+```
+
+
 # Tips
 To complete global Sage objects in a buffer whose major mode is
 `sage-shell:sage-shell-mode`,
