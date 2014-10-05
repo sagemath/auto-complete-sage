@@ -21,8 +21,10 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Setting:
-;; Put the following lines to ~/.emacs.d/init.el.
+;;; Commentary:
+;; To setup, put the following lines to ~/.emacs.d/init.el.
+;; (eval-after-load "auto-complete"
+;;   '(setq ac-modes (append '(sage-shell-mode sage-shell:sage-mode) ac-modes)))
 ;; (add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
 ;; (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 
