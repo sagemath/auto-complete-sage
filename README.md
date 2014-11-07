@@ -1,3 +1,5 @@
+[![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
+
 # Overview
 
 `auto-complete-sage` provides an [auto-complete](https://github.com/auto-complete/auto-complete)
@@ -40,3 +42,8 @@ To complete global Sage objects in a buffer whose major mode is
 run the Sage process and set the process buffer by
 `M-x sage-shell:set-process-buffer` in the `sage-shell:sage-shell-mode`
  buffer.
+
+[melpa-link]: http://melpa.org/#/auto-complete-sage
+[melpa-stable-link]: http://stable.melpa.org/#/auto-complete-sage
+[melpa-badge]: http://melpa.org/packages/auto-complete-sage-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/auto-complete-sage-badge.svg
