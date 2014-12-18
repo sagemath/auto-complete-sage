@@ -43,20 +43,19 @@
   (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t))
 
 (defvar ac-sage-repl:python-kwds
-    '("abs" "all" "and" "any" "apply" "as" "assert" "basestring" "bin"
-      "bool" "break" "buffer" "bytearray" "callable" "chr" "class"
-      "classmethod" "cmp" "coerce" "compile" "complex" "continue" "def"
-      "del" "delattr" "dict" "dir" "divmod" "elif" "else" "enumerate" "eval"
-      "except" "exec" "execfile" "file" "filter" "finally" "float" "for"
-      "format" "from" "frozenset" "getattr" "global" "globals" "hasattr"
-      "hash" "help" "hex" "id" "if" "import" "import" "in" "input" "input"
-      "int" "intern" "is" "isinstance" "issubclass" "iter" "lambda" "len"
-      "list" "locals" "long" "map" "max" "memoryview" "min" "next" "not"
-      "object" "oct" "open" "or" "ord" "pass" "pow" "print" "print"
-      "property" "raise" "range" "raw" "reduce" "reload" "repr" "return"
-      "reversed" "round" "set" "setattr" "slice" "sorted" "staticmethod"
-      "str" "sum" "super" "try" "tuple" "type" "unichr" "unicode" "vars"
-      "while" "with" "xrange" "yield" "zip" "__import__"))
+  '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
+    "bin" "bool" "break" "buffer" "bytearray" "callable" "chr"
+    "class" "classmethod" "cmp" "coerce" "compile" "complex"
+    "continue" "def" "del" "delattr" "dict" "dir" "divmod" "elif"
+    "else" "enumerate" "eval" "except" "exec" "execfile" "file" "filter"
+    "finally" "float" "for" "format" "from" "frozenset" "getattr" "global"
+    "globals" "hasattr" "hash" "help" "hex" "id" "if" "import" "in" "input"
+    "int" "intern" "is" "isinstance" "issubclass" "iter" "lambda" "len" "list"
+    "locals" "long" "map" "max" "memoryview" "min" "next" "not" "object" "oct"
+    "open" "or" "ord" "pass" "pow" "print" "property" "raise" "range" "raw"
+    "reduce" "reload" "repr" "return" "reversed" "round" "set" "setattr"
+    "slice" "sorted" "staticmethod" "str" "sum" "super" "try" "tuple" "type"
+    "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl:init ()
   (when (sage-shell:output-finished-p)
