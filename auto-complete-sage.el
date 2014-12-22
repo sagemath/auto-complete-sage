@@ -4,7 +4,7 @@
 ;; Author: Sho Takemori <stakemorii@gmail.com>
 ;; URL: https://github.com/stakemori/auto-complete-sage
 ;; Keywords: Sage, math, auto-complete
-;; Version: 0.0.1
+;; Version: 0.0.4
 ;; Package-Requires: ((auto-complete "1.4.0") (sage-shell-mode "0.0.1"))
 
 ;;; License
@@ -106,7 +106,7 @@
    ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-commands
-  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
+  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil)))
     (candidates . ac-sage:candidates)
     (cache)))
 
