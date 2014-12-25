@@ -66,13 +66,27 @@
 (defvar ac-source-sage-python-kwds
   '((candidates . (lambda () ac-sage-repl:python-kwds))))
 
+(defun ac-sage-repl-sage-globals-prefix ()
+  (let ((pfx (sage-shell-cpl:prefix)))
+    (when (and pfx (string= (sage-shell-cpl:get 'interface) "sage"))
+      pfx)))
+
+(defvar ac-source-sage-repl-python-kwds
+  (cons '(prefix . ac-sage-repl-sage-globals-prefix)
+        ac-source-sage-python-kwds))
+
+(defvar ac-source-sage-commands
+  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil)))
+    (candidates . ac-sage:candidates)
+    (symbol . "f")
+    (cache)))
+
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
         (append '(ac-source-sage-methods
                   ac-source-sage-other-interfaces
                   ac-source-sage-commands
-                  ac-source-sage-python-kwds
-                  ac-source-sage-words-in-buffers)
+                  ac-source-sage-repl-python-kwds)
                 ac-sources)))
 
 (defvar ac-sage-repl:python-kwds
@@ -123,20 +137,18 @@
 
 (defun ac-sage:candidates ()
   (and sage-shell:process-buffer
-        (and (sage-shell:redirect-finished-p)
-             (sage-shell:output-finished-p))
-        (or ac-sage:sage-commands
-            (setq ac-sage:sage-commands
-                  (sage-shell:awhen (get-buffer sage-shell:process-buffer)
-                    (with-current-buffer it
-                      (or (sage-shell-cpl:get-cmd-lst "sage")
-                          (sage-shell:update-sage-commands))))))))
-
-(defvar ac-source-sage-commands
-  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil)))
-    (candidates . ac-sage:candidates)
-    (symbol . "f")
-    (cache)))
+       ;; To use source 'words-in-sage-buffers' in other intafaces
+       (or (derived-mode-p 'python-mode)
+           (when (eq major-mode 'sage-shell-mode)
+             (string= (sage-shell-cpl:get 'interface) "sage")))
+       (and (sage-shell:redirect-finished-p)
+            (sage-shell:output-finished-p))
+       (or ac-sage:sage-commands
+           (setq ac-sage:sage-commands
+                 (sage-shell:awhen (get-buffer sage-shell:process-buffer)
+                   (with-current-buffer it
+                     (or (sage-shell-cpl:get-cmd-lst "sage")
+                         (sage-shell:update-sage-commands))))))))
 
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
