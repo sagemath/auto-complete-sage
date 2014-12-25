@@ -85,8 +85,9 @@
   (setq ac-sources
         (append '(ac-source-sage-methods
                   ac-source-sage-other-interfaces
+                  ac-source-sage-repl-python-kwds
                   ac-source-sage-commands
-                  ac-source-sage-repl-python-kwds)
+                  ac-source-sage-words-in-buffers)
                 ac-sources)))
 
 (defvar ac-sage-repl:python-kwds
