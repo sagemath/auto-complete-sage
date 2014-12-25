@@ -34,6 +34,42 @@
 
 (setq sage-shell:completion-function 'auto-complete)
 
+(defgroup auto-complete-sage nil "Group for auto-compete-sage"
+  :group 'sage-shell)
+
+(defcustom ac-sage-show-doc-p nil
+  "Non-nil means show ac-doc."
+  :group 'auto-complete-sage
+  :type 'boolean)
+
+(defun ac-sage-setup-internal ()
+  (when ac-sage-show-doc-p
+    (add-to-list 'sage-shell:init-command-list
+                 ;; Send dummy code to import modules.
+                 (format "%s('%s')"
+                         (sage-shell:py-mod-func "print_short_doc_and_def")
+                         "NumberField")
+                 t)))
+
+(add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
+
+(defun ac-sage-doc (can)
+  (when (and ac-sage-show-doc-p
+             (sage-shell:at-top-level-and-in-sage-p))
+    (let* ((name (sage-shell:acond
+                  ((sage-shell-cpl:get 'var-base-name) (format "%s.%s" it can))
+                  ((sage-shell:in (sage-shell-cpl:get 'interface)
+                                  sage-shell-interfaces:other-interfaces)
+                   (format "%s.%s" it can))
+                  (t can)))
+           (doc (sage-shell:send-command-to-string
+                 (format "%s('%s')"
+                         (sage-shell:py-mod-func "print_short_doc_and_def")
+                         name))))
+      (if (string-match (rx "\n" buffer-end) doc)
+          (replace-match "" t t doc)
+        doc))))
+
 
 ;;; sage-shell-ac
 (defvar ac-sage--repl-common
@@ -43,7 +79,8 @@
 
 (defvar ac-source-sage-methods
   (append '((prefix . ac-sage-methods-prefix)
-            (symbol . "f"))
+            (symbol . "f")
+            (document . ac-sage-doc))
         ac-sage--repl-common))
 
 (defun ac-sage-methods-prefix ()
@@ -77,6 +114,7 @@
 
 (defvar ac-source-sage-commands
   '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil)))
+    (document . ac-sage-doc)
     (candidates . ac-sage:candidates)
     (symbol . "f")
     (cache)))
