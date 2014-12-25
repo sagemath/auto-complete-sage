@@ -4,8 +4,8 @@
 ;; Author: Sho Takemori <stakemorii@gmail.com>
 ;; URL: https://github.com/stakemori/auto-complete-sage
 ;; Keywords: Sage, math, auto-complete
-;; Version: 0.0.4
-;; Package-Requires: ((auto-complete "1.4.0") (sage-shell-mode "0.0.1"))
+;; Version: 0.0.2
+;; Package-Requires: ((auto-complete "1.4.0") (sage-shell-mode "0.0.4"))
 
 ;;; License
 ;; This program is free software; you can redistribute it and/or modify
@@ -36,11 +36,44 @@
 
 
 ;;; sage-shell-ac
+(defvar ac-sage--repl-common
+  '((init . ac-sage-repl:init)
+    (candidates . ac-sage-repl:candidates)
+    (cache)))
+
+(defvar ac-source-sage-methods
+  (append '((prefix . ac-sage-methods-prefix)
+            (symbol . "f"))
+        ac-sage--repl-common))
+
+(defun ac-sage-methods-prefix ()
+  (let ((pfx (sage-shell-cpl:prefix)))
+    (when (and pfx (sage-shell-cpl:get 'var-base-name))
+      pfx)))
+
+(defvar ac-source-sage-other-interfaces
+  (append '((prefix . ac-sage-other-int-prefix)
+            (symbol . "f"))
+        ac-sage--repl-common))
+
+(defun ac-sage-other-int-prefix ()
+  (let ((pfx (sage-shell-cpl:prefix)))
+    (when (and pfx (not (string= (sage-shell-cpl:get 'interface) "sage")))
+      pfx)))
+
 (add-to-list 'ac-modes 'sage-shell-mode)
 
+(defvar ac-source-sage-python-kwds
+  '((candidates . (lambda () ac-sage-repl:python-kwds))))
+
 (defun ac-sage-repl:add-sources ()
-  (add-to-list 'ac-sources 'ac-source-sage-shell)
-  (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t))
+  (setq ac-sources
+        (append '(ac-source-sage-methods
+                  ac-source-sage-other-interfaces
+                  ac-source-sage-commands
+                  ac-source-sage-python-kwds
+                  ac-source-sage-words-in-buffers)
+                ac-sources)))
 
 (defvar ac-sage-repl:python-kwds
   '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
@@ -67,11 +100,7 @@
 (defun ac-sage-repl:candidates ()
   (when (and (sage-shell:redirect-finished-p)
              (sage-shell:output-finished-p))
-    (let* ((keywords (if (and (not (sage-shell-cpl:get 'var-base-name))
-                              (equal (sage-shell-cpl:get 'interface) "sage"))
-                         ac-sage-repl:python-kwds
-                       nil)))
-      (append keywords (sage-shell-cpl:candidates)))))
+    (sage-shell-cpl:candidates)))
 
 (defvar ac-source-sage-shell
   '((init . ac-sage-repl:init)
@@ -84,17 +113,16 @@
 (add-to-list 'ac-modes 'sage-shell:sage-mode)
 
 (defun ac-sage:add-sources ()
-  (add-to-list 'ac-sources 'ac-source-sage-commands)
-  (add-to-list 'ac-sources 'ac-source-words-in-sage-buffers t)
   (setq ac-sources
-        (delete 'ac-source-words-in-same-mode-buffers ac-sources)))
+        (append '(ac-source-sage-commands
+                  ac-source-sage-words-in-buffers)
+                ac-sources)))
 
 (defvar ac-sage:sage-commands nil)
 (make-variable-buffer-local 'ac-sage:sage-commands)
 
 (defun ac-sage:candidates ()
-  (append
-   (and sage-shell:process-buffer
+  (and sage-shell:process-buffer
         (and (sage-shell:redirect-finished-p)
              (sage-shell:output-finished-p))
         (or ac-sage:sage-commands
@@ -102,12 +130,12 @@
                   (sage-shell:awhen (get-buffer sage-shell:process-buffer)
                     (with-current-buffer it
                       (or (sage-shell-cpl:get-cmd-lst "sage")
-                          (sage-shell:update-sage-commands)))))))
-   ac-sage-repl:python-kwds))
+                          (sage-shell:update-sage-commands))))))))
 
 (defvar ac-source-sage-commands
   '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil)))
     (candidates . ac-sage:candidates)
+    (symbol . "f")
     (cache)))
 
 (defun ac-sage:words-in-sage-buffers ()
@@ -115,7 +143,7 @@
    (lambda (buf)
      (sage-shell:in (buffer-local-value 'major-mode buf) sage-shell:sage-modes))))
 
-(defvar ac-source-words-in-sage-buffers
+(defvar ac-source-sage-words-in-buffers
   '((init . ac-update-word-index)
     (candidates . ac-sage:words-in-sage-buffers)))
 
