@@ -61,38 +61,47 @@
 
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
 
+(defvar ac-sage--doc-cached nil)
+(make-variable-buffer-local 'ac-sage--doc-cached)
+
+(defmacro ac-sage--cache-doc (doc-func name base-name)
+  `(sage-shell:with-current-buffer-safe sage-shell:process-buffer
+     (sage-shell:aif (assoc-default ,name ac-sage--doc-cached)
+         it
+       (let ((doc (,doc-func ,name ,base-name)))
+         (prog1
+             doc
+           (setq ac-sage--doc-cached
+                 (cons (cons ,name doc) ac-sage--doc-cached)))))))
+
 (defun ac-sage-doc (can)
   (when ac-sage-show-quick-help
-    (ac-sage--doc can)))
+    (ac-sage--cache-doc ac-sage--doc can nil)))
 
 (defun ac-sage-repl-doc (can)
   (when ac-sage-show-quick-help
-    (ac-sage--repl-doc can)))
-
-(defun ac-sage--repl-doc (can)
-  (when (sage-shell:at-top-level-and-in-sage-p)
     (let* ((base-name
             (or (sage-shell-cpl:get 'var-base-name)
                 (sage-shell:in (sage-shell-cpl:get 'interface)
                                sage-shell-interfaces:other-interfaces)))
            (name (sage-shell:aif base-name
                      (format "%s.%s" it can)
-                   can))
-           (doc (sage-shell:send-command-to-string
-                 (format "%s('%s'%s)"
-                         (sage-shell:py-mod-func "print_short_doc_and_def")
-                         name
-                         (sage-shell:aif base-name
-                             (format ", base_name='%s'" it)
-                           "")))))
-      (ac-sage-string-trim-left doc))))
+                   can)))
+      (ac-sage--cache-doc ac-sage--repl-doc name base-name))))
 
-(defun ac-sage--doc (can)
+(defun ac-sage--repl-doc (name base-name)
+  (when (sage-shell:at-top-level-and-in-sage-p)
+    (ac-sage--doc name base-name)))
+
+(defun ac-sage--doc (name base-name)
   (ac-sage-string-trim-left
    (sage-shell:send-command-to-string
     (format "%s('%s'%s)"
             (sage-shell:py-mod-func "print_short_doc_and_def")
-            can ""))))
+            name
+            (sage-shell:aif base-name
+                (format ", base_name='%s'" it)
+              "")))))
 
 (defvar ac-sage--repl-common
   '((init . ac-sage-repl:init)
