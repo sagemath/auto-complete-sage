@@ -134,6 +134,12 @@
   (cons '(prefix . ac-sage-repl-sage-globals-prefix)
         ac-source-sage-python-kwds))
 
+(defvar ac-source-repl-sage-commands
+  '((document . ac-sage-repl-doc)
+    (symbol . "f")
+    (candidates . ac-sage:candidates)
+    (cache)))
+
 (defvar ac-source-sage-commands
   '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
     (document . ac-sage-doc)
@@ -146,7 +152,7 @@
         (append '(ac-source-sage-methods
                   ac-source-sage-other-interfaces
                   ac-source-sage-repl-python-kwds
-                  ac-source-sage-commands
+                  ac-source-repl-sage-commands
                   ac-source-sage-words-in-buffers)
                 ac-sources)))
 
