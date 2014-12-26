@@ -229,7 +229,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage:add-sources ()
   (setq ac-sources
         (append '(ac-source-sage-commands
-                  ac-source-sage-words-in-buffers)
+                  ac-source-sage-words-in-buffers
+                  ac-source-sage-python-kwds)
                 ac-sources)))
 
 (defvar ac-sage--sage-commands-cached nil)
