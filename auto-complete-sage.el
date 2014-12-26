@@ -59,6 +59,10 @@
 (defvar ac-sage--doc-cached nil)
 (make-variable-buffer-local 'ac-sage--doc-cached)
 
+(defun ac-sage--doc-clear-cache ()
+  (sage-shell:with-current-buffer-safe sage-shell:process-buffer
+    (setq ac-sage--doc-cached nil)))
+
 (defmacro ac-sage--cache-doc (doc-func name base-name)
   `(sage-shell:with-current-buffer-safe sage-shell:process-buffer
      (sage-shell:aif (assoc-default ,name ac-sage--doc-cached)
@@ -138,12 +142,14 @@
 
 (defvar ac-source-repl-sage-commands
   '((document . ac-sage-repl-doc)
+    (init . ac-sage--doc-clear-cache)
     (symbol . "f")
     (candidates . ac-sage-commands-candidates)
     (cache)))
 
 (defvar ac-source-sage-commands
-  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
+  '((init . (lambda () (ac-sage--doc-clear-cache)
+              (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
     (document . ac-sage-doc)
     (candidates . ac-sage-commands-candidates)
     (symbol . "f")
@@ -174,6 +180,7 @@
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl:init ()
+  (ac-sage--doc-clear-cache)
   (when (sage-shell:output-finished-p)
     (sage-shell-cpl:completion-init
      (sage-shell-cpl:get 'interface)
