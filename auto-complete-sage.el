@@ -43,6 +43,11 @@
   :group 'auto-complete-sage
   :type 'boolean)
 
+(defun ac-sage-string-trim-left (s)
+  (if (string-match (rx "\n" buffer-end) s)
+      (replace-match "" t t s)
+    s))
+
 (defun ac-sage-setup-internal ()
   (when ac-sage-show-quick-help
     (set (make-local-variable 'sage-shell:init-command-list)
