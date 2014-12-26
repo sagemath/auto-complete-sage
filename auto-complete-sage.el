@@ -75,8 +75,8 @@
        (let ((doc (,doc-func ,name ,base-name)))
          (prog1
              doc
-           (setq ac-sage--repl-methods-cached
-                 (cons (cons ,name doc) ac-sage--repl-methods-cached)))))))
+           (setq ,cache-var
+                 (cons (cons ,name doc) ,cache-var)))))))
 
 (defun ac-sage-doc (can)
   (when ac-sage-show-quick-help
