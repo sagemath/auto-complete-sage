@@ -55,7 +55,10 @@
 
 (defun ac-sage-doc (can)
   (when (and ac-sage-show-doc-p
-             (sage-shell:at-top-level-and-in-sage-p))
+             (cond
+              ((derived-mode-p 'python-mode) t)
+              ((eq major-mode 'sage-shell-mode)
+               (sage-shell:at-top-level-and-in-sage-p))))
     (let* ((name (sage-shell:acond
                   ((sage-shell-cpl:get 'var-base-name) (format "%s.%s" it can))
                   ((sage-shell:in (sage-shell-cpl:get 'interface)
