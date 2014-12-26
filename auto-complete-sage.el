@@ -59,13 +59,18 @@
 (defvar ac-sage--doc-cached nil)
 (make-variable-buffer-local 'ac-sage--doc-cached)
 
+(defvar ac-sage--sage-commands-doc-cached nil)
+
 (defun ac-sage--doc-clear-cache ()
   (sage-shell:with-current-buffer-safe sage-shell:process-buffer
     (setq ac-sage--doc-cached nil)))
 
-(defmacro ac-sage--cache-doc (doc-func name base-name)
+(cl-defmacro ac-sage--cache-doc (doc-func name base-name
+                                          cache-var
+                                          &optional (min-len 0))
   `(sage-shell:with-current-buffer-safe sage-shell:process-buffer
-     (sage-shell:aif (assoc-default ,name ac-sage--doc-cached)
+     (sage-shell:aif (and (> (length ,name) ,min-len)
+                          (assoc-default ,name ,cache-var))
          it
        (let ((doc (,doc-func ,name ,base-name)))
          (prog1
@@ -75,7 +80,16 @@
 
 (defun ac-sage-doc (can)
   (when ac-sage-show-quick-help
-    (ac-sage--cache-doc ac-sage--doc can nil)))
+    (ac-sage--cache-doc ac-sage--doc can nil
+                        ac-sage--sage-commands-doc-cached
+                        ;; Short names may be re-defined.
+                        4)))
+
+(defun ac-sage-repl-sage-commands-doc (can)
+  (when ac-sage-show-quick-help
+    (ac-sage--cache-doc ac-sage--repl-doc can nil
+                        ac-sage--sage-commands-doc-cached
+                        4)))
 
 (defun ac-sage-repl-doc (can)
   (when ac-sage-show-quick-help
@@ -86,7 +100,8 @@
            (name (sage-shell:aif base-name
                      (format "%s.%s" it can)
                    can)))
-      (ac-sage--cache-doc ac-sage--repl-doc name base-name))))
+      (ac-sage--cache-doc ac-sage--repl-doc name base-name
+                          ac-sage--doc-cached))))
 
 (defun ac-sage--repl-doc (name base-name)
   (when (sage-shell:at-top-level-and-in-sage-p)
@@ -141,14 +156,13 @@
         ac-source-sage-python-kwds))
 
 (defvar ac-source-repl-sage-commands
-  '((document . ac-sage-repl-doc)
-    (init . ac-sage--doc-clear-cache)
+  '((document . ac-sage-repl-sage-commands-doc)
     (symbol . "f")
     (candidates . ac-sage-commands-candidates)
     (cache)))
 
 (defvar ac-source-sage-commands
-  '((init . (lambda () (ac-sage--doc-clear-cache)
+  '((init . (lambda ()
               (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
     (document . ac-sage-doc)
     (candidates . ac-sage-commands-candidates)
