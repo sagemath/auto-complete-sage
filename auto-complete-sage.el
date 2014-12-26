@@ -37,13 +37,14 @@
 (defgroup auto-complete-sage nil "Group for auto-compete-sage"
   :group 'sage-shell)
 
-(defcustom ac-sage-show-doc-p nil
-  "Non-nil means show ac-doc."
+(defcustom ac-sage-show-quick-help nil
+  "Non-nil means show quick help of auto-complete-mode in
+`sage-shell-mode' buffers and `sage-shell:sage-mode' buffers."
   :group 'auto-complete-sage
   :type 'boolean)
 
 (defun ac-sage-setup-internal ()
-  (when ac-sage-show-doc-p
+  (when ac-sage-show-quick-help
     (add-to-list 'sage-shell:init-command-list
                  ;; Send dummy code to import modules.
                  (format "%s('%s')"
@@ -54,7 +55,7 @@
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
 
 (defun ac-sage-doc (can)
-  (when (and ac-sage-show-doc-p
+  (when (and ac-sage-show-quick-help
              (cond
               ((derived-mode-p 'python-mode) t)
               ((eq major-mode 'sage-shell-mode)
