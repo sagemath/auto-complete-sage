@@ -56,14 +56,14 @@
 
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
 
-(defvar ac-sage--doc-cached nil)
-(make-variable-buffer-local 'ac-sage--doc-cached)
+(defvar ac-sage--repl-methods-cached nil)
+(make-variable-buffer-local 'ac-sage--repl-methods-cached)
 
 (defvar ac-sage--sage-commands-doc-cached nil)
 
 (defun ac-sage--doc-clear-cache ()
   (sage-shell:with-current-buffer-safe sage-shell:process-buffer
-    (setq ac-sage--doc-cached nil)))
+    (setq ac-sage--repl-methods-cached nil)))
 
 (cl-defmacro ac-sage--cache-doc (doc-func name base-name
                                           cache-var
@@ -75,8 +75,8 @@
        (let ((doc (,doc-func ,name ,base-name)))
          (prog1
              doc
-           (setq ac-sage--doc-cached
-                 (cons (cons ,name doc) ac-sage--doc-cached)))))))
+           (setq ac-sage--repl-methods-cached
+                 (cons (cons ,name doc) ac-sage--repl-methods-cached)))))))
 
 (defun ac-sage-doc (can)
   (when ac-sage-show-quick-help
@@ -91,7 +91,7 @@
                         ac-sage--sage-commands-doc-cached
                         4)))
 
-(defun ac-sage-repl-doc (can)
+(defun ac-sage-repl-methods-doc (can)
   (when ac-sage-show-quick-help
     (let* ((base-name
             (or (sage-shell-cpl:get 'var-base-name)
@@ -101,7 +101,7 @@
                      (format "%s.%s" it can)
                    can)))
       (ac-sage--cache-doc ac-sage--repl-doc name base-name
-                          ac-sage--doc-cached))))
+                          ac-sage--repl-methods-cached))))
 
 (defun ac-sage--repl-doc (name base-name)
   (when (sage-shell:at-top-level-and-in-sage-p)
@@ -125,7 +125,7 @@
 (defvar ac-source-sage-methods
   (append '((prefix . ac-sage-methods-prefix)
             (symbol . "f")
-            (document . ac-sage-repl-doc))
+            (document . ac-sage-repl-methods-doc))
         ac-sage--repl-common))
 
 (defun ac-sage-methods-prefix ()
@@ -205,12 +205,6 @@
   (when (and (sage-shell:redirect-finished-p)
              (sage-shell:output-finished-p))
     (sage-shell-cpl:candidates)))
-
-(defvar ac-source-sage-shell
-  '((init . ac-sage-repl:init)
-    (prefix . sage-shell-cpl:prefix)
-    (candidates . ac-sage-repl:candidates)
-    (cache)))
 
 
 ;; sage-edit-ac
