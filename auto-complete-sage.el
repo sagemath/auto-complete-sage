@@ -162,17 +162,31 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     (when (and pfx (not (string= (sage-shell-cpl:get 'interface) "sage")))
       pfx)))
 
+(defvar ac-sage-repl:python-kwds
+  '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
+    "bin" "bool" "break" "buffer" "bytearray" "callable" "chr"
+    "class" "classmethod" "cmp" "coerce" "compile" "complex"
+    "continue" "def" "del" "delattr" "dict" "dir" "divmod" "elif"
+    "else" "enumerate" "eval" "except" "exec" "execfile" "file" "filter"
+    "finally" "float" "for" "format" "from" "frozenset" "getattr" "global"
+    "globals" "hasattr" "hash" "help" "hex" "id" "if" "import" "in" "input"
+    "int" "intern" "is" "isinstance" "issubclass" "iter" "lambda" "len" "list"
+    "locals" "long" "map" "max" "memoryview" "min" "next" "not" "object" "oct"
+    "open" "or" "ord" "pass" "pow" "print" "property" "raise" "range" "raw"
+    "reduce" "reload" "repr" "return" "reversed" "round" "set" "setattr"
+    "slice" "sorted" "staticmethod" "str" "sum" "super" "try" "tuple" "type"
+    "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
+
 (defvar ac-source-sage-python-kwds
   '((candidates . (lambda () ac-sage-repl:python-kwds))))
 
-(defun ac-sage-repl-sage-globals-prefix ()
-  (let ((pfx (sage-shell-cpl:prefix)))
-    (when (and pfx (string= (sage-shell-cpl:get 'interface) "sage"))
-      pfx)))
+(defun ac-sage-repl-python-kwds-candidates ()
+  (when (and (string= (sage-shell-cpl:get 'interface) "sage")
+             (not (not (sage-shell-cpl:get 'var-base-name))))
+    ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-repl-python-kwds
-  (cons '(prefix . ac-sage-repl-sage-globals-prefix)
-        ac-source-sage-python-kwds))
+  '((candidates . ac-sage-repl-python-kwds-candidates)))
 
 (defvar ac-source-repl-sage-commands
   '((document . ac-sage-repl-sage-commands-doc)
@@ -196,21 +210,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                   ac-source-repl-sage-commands
                   ac-source-sage-words-in-buffers)
                 ac-sources)))
-
-(defvar ac-sage-repl:python-kwds
-  '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
-    "bin" "bool" "break" "buffer" "bytearray" "callable" "chr"
-    "class" "classmethod" "cmp" "coerce" "compile" "complex"
-    "continue" "def" "del" "delattr" "dict" "dir" "divmod" "elif"
-    "else" "enumerate" "eval" "except" "exec" "execfile" "file" "filter"
-    "finally" "float" "for" "format" "from" "frozenset" "getattr" "global"
-    "globals" "hasattr" "hash" "help" "hex" "id" "if" "import" "in" "input"
-    "int" "intern" "is" "isinstance" "issubclass" "iter" "lambda" "len" "list"
-    "locals" "long" "map" "max" "memoryview" "min" "next" "not" "object" "oct"
-    "open" "or" "ord" "pass" "pow" "print" "property" "raise" "range" "raw"
-    "reduce" "reload" "repr" "return" "reversed" "round" "set" "setattr"
-    "slice" "sorted" "staticmethod" "str" "sum" "super" "try" "tuple" "type"
-    "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl:init ()
   (ac-sage--doc-clear-cache)
