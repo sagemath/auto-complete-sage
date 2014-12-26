@@ -60,16 +60,20 @@
               ((derived-mode-p 'python-mode) t)
               ((eq major-mode 'sage-shell-mode)
                (sage-shell:at-top-level-and-in-sage-p))))
-    (let* ((name (sage-shell:acond
-                  ((sage-shell-cpl:get 'var-base-name) (format "%s.%s" it can))
-                  ((sage-shell:in (sage-shell-cpl:get 'interface)
-                                  sage-shell-interfaces:other-interfaces)
-                   (format "%s.%s" it can))
-                  (t can)))
+    (let* ((base-name
+            (or (sage-shell-cpl:get 'var-base-name)
+                (sage-shell:in (sage-shell-cpl:get 'interface)
+                               sage-shell-interfaces:other-interfaces)))
+           (name (sage-shell:aif base-name
+                     (format "%s.%s" it can)
+                   can))
            (doc (sage-shell:send-command-to-string
-                 (format "%s('%s')"
+                 (format "%s('%s'%s)"
                          (sage-shell:py-mod-func "print_short_doc_and_def")
-                         name))))
+                         name
+                         (sage-shell:aif base-name
+                             (format ", base_name='%s'" it)
+                           "")))))
       (if (string-match (rx "\n" buffer-end) doc)
           (replace-match "" t t doc)
         doc))))
@@ -117,7 +121,7 @@
         ac-source-sage-python-kwds))
 
 (defvar ac-source-sage-commands
-  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil)))
+  '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
     (document . ac-sage-doc)
     (candidates . ac-sage:candidates)
     (symbol . "f")
