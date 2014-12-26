@@ -110,14 +110,16 @@
 (defun ac-sage--doc (name base-name)
   (when (and (sage-shell:output-finished-p)
              (sage-shell:redirect-finished-p))
-    (sage-shell:trim-left
-     (sage-shell:send-command-to-string
-      (format "%s('%s'%s)"
-              (sage-shell:py-mod-func "print_short_doc_and_def")
-              name
-              (sage-shell:aif base-name
-                  (format ", base_name='%s'" it)
-                ""))))))
+    (let ((doc (sage-shell:trim-left
+                (sage-shell:send-command-to-string
+                 (format "%s('%s'%s)"
+                         (sage-shell:py-mod-func "print_short_doc_and_def")
+                         name
+                         (sage-shell:aif base-name
+                             (format ", base_name='%s'" it)
+                           ""))))))
+      (unless (string= doc "")
+        doc))))
 
 (defvar ac-sage--repl-common
   '((init . ac-sage-repl:init)
