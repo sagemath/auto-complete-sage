@@ -60,11 +60,15 @@
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
 
 (defun ac-sage-doc (can)
-  (when (and ac-sage-show-quick-help
-             (cond
-              ((derived-mode-p 'python-mode) t)
-              ((eq major-mode 'sage-shell-mode)
-               (sage-shell:at-top-level-and-in-sage-p))))
+  (when ac-sage-show-quick-help
+    (ac-sage--doc can)))
+
+(defun ac-sage-repl-doc (can)
+  (when ac-sage-show-quick-help
+    (ac-sage--repl-doc can)))
+
+(defun ac-sage--repl-doc (can)
+  (when (sage-shell:at-top-level-and-in-sage-p)
     (let* ((base-name
             (or (sage-shell-cpl:get 'var-base-name)
                 (sage-shell:in (sage-shell-cpl:get 'interface)
@@ -79,9 +83,14 @@
                          (sage-shell:aif base-name
                              (format ", base_name='%s'" it)
                            "")))))
-      (if (string-match (rx "\n" buffer-end) doc)
-          (replace-match "" t t doc)
-        doc))))
+      (ac-sage-string-trim-left doc))))
+
+(defun ac-sage--doc (can)
+  (ac-sage-string-trim-left
+   (sage-shell:send-command-to-string
+    (format "%s('%s'%s)"
+            (sage-shell:py-mod-func "print_short_doc_and_def")
+            can ""))))
 
 
 ;;; sage-shell-ac
@@ -93,7 +102,7 @@
 (defvar ac-source-sage-methods
   (append '((prefix . ac-sage-methods-prefix)
             (symbol . "f")
-            (document . ac-sage-doc))
+            (document . ac-sage-repl-doc))
         ac-sage--repl-common))
 
 (defun ac-sage-methods-prefix ()
