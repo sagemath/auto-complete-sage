@@ -33,6 +33,8 @@
 (require 'sage-shell-mode)
 
 (setq sage-shell:completion-function 'auto-complete)
+(add-to-list 'ac-modes 'sage-shell-mode)
+(add-to-list 'ac-modes 'sage-shell:sage-mode)
 
 (defgroup auto-complete-sage nil "Group for auto-compete-sage"
   :group 'sage-shell)
@@ -92,8 +94,6 @@
             (sage-shell:py-mod-func "print_short_doc_and_def")
             can ""))))
 
-
-;;; sage-shell-ac
 (defvar ac-sage--repl-common
   '((init . ac-sage-repl:init)
     (candidates . ac-sage-repl:candidates)
@@ -120,8 +120,6 @@
     (when (and pfx (not (string= (sage-shell-cpl:get 'interface) "sage")))
       pfx)))
 
-(add-to-list 'ac-modes 'sage-shell-mode)
-
 (defvar ac-source-sage-python-kwds
   '((candidates . (lambda () ac-sage-repl:python-kwds))))
 
@@ -137,13 +135,13 @@
 (defvar ac-source-repl-sage-commands
   '((document . ac-sage-repl-doc)
     (symbol . "f")
-    (candidates . ac-sage:candidates)
+    (candidates . ac-sage-commands-candidates)
     (cache)))
 
 (defvar ac-source-sage-commands
   '((init . (lambda () (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
     (document . ac-sage-doc)
-    (candidates . ac-sage:candidates)
+    (candidates . ac-sage-commands-candidates)
     (symbol . "f")
     (cache)))
 
@@ -191,8 +189,6 @@
 
 
 ;; sage-edit-ac
-(add-to-list 'ac-modes 'sage-shell:sage-mode)
-
 (defun ac-sage:add-sources ()
   (setq ac-sources
         (append '(ac-source-sage-commands
@@ -202,7 +198,7 @@
 (defvar ac-sage:sage-commands nil)
 (make-variable-buffer-local 'ac-sage:sage-commands)
 
-(defun ac-sage:candidates ()
+(defun ac-sage-commands-candidates ()
   (and sage-shell:process-buffer
        ;; To use source 'words-in-sage-buffers' in other intafaces
        (or (derived-mode-p 'python-mode)
