@@ -45,6 +45,14 @@
   :group 'auto-complete-sage
   :type 'boolean)
 
+(defcustom ac-sage-quick-help-ignore-classes nil
+  "If non-nil, this should be a list of strings.
+Each string shoud be a class of Sage. When non-nil instances or methods
+of these classes are ignored by `ac-quick-help'.
+If the value is equal to '(\"\"), then it does not ignore anything."
+  :group 'auto-complete-sage
+  :type '(repeat string))
+
 (defun ac-sage-setup-internal ()
   (when ac-sage-show-quick-help
     (set (make-local-variable 'sage-shell:init-command-list)
@@ -52,6 +60,13 @@
          (cons (format "%s('%s')"
                        (sage-shell:py-mod-func "print_short_doc_and_def")
                        "NumberField")
+               sage-shell:init-command-list)))
+  (sage-shell:awhen ac-sage-quick-help-ignore-classes
+    (set (make-local-variable 'sage-shell:init-command-list)
+         (cons (format "%s.ignore_classes = [%s]"
+                       sage-shell:python-module
+                       (mapconcat 'identity
+                                  ac-sage-quick-help-ignore-classes ", "))
                sage-shell:init-command-list))))
 
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
