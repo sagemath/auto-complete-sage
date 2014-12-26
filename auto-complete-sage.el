@@ -214,23 +214,24 @@
                   ac-source-sage-words-in-buffers)
                 ac-sources)))
 
-(defvar ac-sage:sage-commands nil)
-(make-variable-buffer-local 'ac-sage:sage-commands)
+(defvar ac-sage--sage-commands-cached nil)
+(make-variable-buffer-local 'ac-sage--sage-commands-cached)
 
 (defun ac-sage-commands-candidates ()
-  (and sage-shell:process-buffer
-       ;; To use source 'words-in-sage-buffers' in other intafaces
-       (or (derived-mode-p 'python-mode)
-           (when (eq major-mode 'sage-shell-mode)
-             (string= (sage-shell-cpl:get 'interface) "sage")))
-       (and (sage-shell:redirect-finished-p)
-            (sage-shell:output-finished-p))
-       (or ac-sage:sage-commands
-           (setq ac-sage:sage-commands
-                 (sage-shell:awhen (get-buffer sage-shell:process-buffer)
-                   (with-current-buffer it
+  (or (sage-shell:with-current-buffer-safe
+          sage-shell:process-buffer
+        ac-sage--sage-commands-cached)
+      (and sage-shell:process-buffer
+           ;; To use source 'words-in-sage-buffers' in other intafaces
+           (or (derived-mode-p 'python-mode)
+               (when (eq major-mode 'sage-shell-mode)
+                 (string= (sage-shell-cpl:get 'interface) "sage")))
+           (and (sage-shell:redirect-finished-p)
+                (sage-shell:output-finished-p))
+           (sage-shell:with-current-buffer-safe sage-shell:process-buffer
+               (setq ac-sage--sage-commands-cached
                      (or (sage-shell-cpl:get-cmd-lst "sage")
-                         (sage-shell:update-sage-commands))))))))
+                         (sage-shell:update-sage-commands)))))))
 
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
