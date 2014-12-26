@@ -45,12 +45,12 @@
 
 (defun ac-sage-setup-internal ()
   (when ac-sage-show-quick-help
-    (add-to-list 'sage-shell:init-command-list
-                 ;; Send dummy code to import modules.
-                 (format "%s('%s')"
-                         (sage-shell:py-mod-func "print_short_doc_and_def")
-                         "NumberField")
-                 t)))
+    (set (make-local-variable 'sage-shell:init-command-list)
+         ;; Send dummy code to import modules.
+         (cons (format "%s('%s')"
+                       (sage-shell:py-mod-func "print_short_doc_and_def")
+                       "NumberField")
+               sage-shell:init-command-list))))
 
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
 
