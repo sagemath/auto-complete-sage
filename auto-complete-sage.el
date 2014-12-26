@@ -241,7 +241,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
              ;; To use source 'words-in-sage-buffers' in other intafaces
              (or (derived-mode-p 'python-mode)
                  (when (eq major-mode 'sage-shell-mode)
-                   (string= (sage-shell-cpl:get 'interface) "sage"))))
+                   (and (string= (sage-shell-cpl:get 'interface) "sage")
+                        (not (sage-shell-cpl:get 'var-base-name))))))
     (sage-shell:with-current-buffer-safe sage-shell:process-buffer
       (or ac-sage--sage-commands-cached
           (setq ac-sage--sage-commands-cached
