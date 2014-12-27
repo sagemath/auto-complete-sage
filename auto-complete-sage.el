@@ -233,9 +233,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                   ac-source-sage-python-kwds)
                 ac-sources)))
 
-(defvar ac-sage--sage-commands-cached nil)
-(make-variable-buffer-local 'ac-sage--sage-commands-cached)
-
 (defun ac-sage-commands-candidates ()
   (when (and sage-shell:process-buffer
              ;; To use source 'words-in-sage-buffers' in other intafaces
@@ -244,10 +241,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                    (and (string= (sage-shell-cpl:get 'interface) "sage")
                         (not (sage-shell-cpl:get 'var-base-name))))))
     (sage-shell:with-current-buffer-safe sage-shell:process-buffer
-      (or ac-sage--sage-commands-cached
-          (setq ac-sage--sage-commands-cached
-                (or (sage-shell-cpl:get-cmd-lst "sage")
-                    (sage-shell:update-sage-commands)))))))
+      (or (sage-shell-cpl:get-cmd-lst "sage")
+          (sage-shell:update-sage-commands)))))
 
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
