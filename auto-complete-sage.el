@@ -182,7 +182,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defun ac-sage-repl-python-kwds-candidates ()
   (when (and (string= (sage-shell-cpl:get 'interface) "sage")
-             (not (not (sage-shell-cpl:get 'var-base-name))))
+             (null (sage-shell-cpl:get 'var-base-name)))
     ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-repl-python-kwds
