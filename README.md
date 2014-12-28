@@ -36,12 +36,14 @@ put the following line to `"~/.emacs.d/init.el"`:
 ```
 
 
-# Tips
-To complete global Sage objects in a buffer whose major mode is
-`sage-shell:sage-shell-mode`,
-run the Sage process and set the process buffer by
-`M-x sage-shell:set-process-buffer` in the `sage-shell:sage-shell-mode`
- buffer.
+# Customization
+To show a quick help, put the following line to `~/.emacs.d/init.el`.
+
+```
+(setq ac-sage-show-quick-help t)
+```
+
+For more customization, `M-x customize-group RET auto-complete-sage`.
 
 [melpa-link]: http://melpa.org/#/auto-complete-sage
 [melpa-stable-link]: http://stable.melpa.org/#/auto-complete-sage
