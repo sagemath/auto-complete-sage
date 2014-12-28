@@ -136,16 +136,23 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (unless (string= doc "")
         doc))))
 
-(defvar ac-sage--repl-common
-  '((init . ac-sage-repl:init)
+(defvar ac-source-sage-methods
+  '((init . ac-sage-repl-methods-init)
+    (prefix . ac-sage-methods-prefix)
+    (symbol . "f")
+    (document . ac-sage-repl-methods-doc)
     (candidates . ac-sage-repl:candidates)
     (cache)))
 
-(defvar ac-source-sage-methods
-  (append '((prefix . ac-sage-methods-prefix)
-            (symbol . "f")
-            (document . ac-sage-repl-methods-doc))
-        ac-sage--repl-common))
+(defun ac-sage-repl-methods-init ()
+  (ac-sage--doc-clear-cache)
+  (when (and (integerp ac-auto-start)
+             (= (- (point) (sage-shell-cpl:get 'prefix))
+                ac-auto-start))
+    (sage-shell-cpl:completion-init
+     (sage-shell-cpl:get 'interface)
+     (sage-shell-cpl:get 'var-base-name)
+     (equal this-command 'auto-complete))))
 
 (defun ac-sage-methods-prefix ()
   (let ((pfx (sage-shell-cpl:prefix)))
@@ -153,9 +160,11 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       pfx)))
 
 (defvar ac-source-sage-other-interfaces
-  (append '((prefix . ac-sage-other-int-prefix)
-            (symbol . "f"))
-        ac-sage--repl-common))
+  '((prefix . ac-sage-other-int-prefix)
+    (symbol . "f")
+    (init . ac-sage-repl:init)
+    (candidates . ac-sage-repl:candidates)
+    (cache)))
 
 (defun ac-sage-other-int-prefix ()
   (let ((pfx (sage-shell-cpl:prefix)))
@@ -212,7 +221,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                 ac-sources)))
 
 (defun ac-sage-repl:init ()
-  (ac-sage--doc-clear-cache)
   (when (sage-shell:output-finished-p)
     (sage-shell-cpl:completion-init
      (sage-shell-cpl:get 'interface)
