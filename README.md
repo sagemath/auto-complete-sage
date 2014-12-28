@@ -1,13 +1,15 @@
+# auto-complete-sage
+
 [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
-# Overview
+## Overview
 
 `auto-complete-sage` provides an [auto-complete](https://github.com/auto-complete/auto-complete)
  source for [sage-shell-mode](https://github.com/stakemori/sage-shell-mode).
 
 ![ac-sage](images/ac-sage.gif)
 
-# Installation
+## Installation
 You can install `auto-complete-sage` from
 [MELPA](https://github.com/milkypostman/melpa.git) by package.el
 (`M-x package-install auto-complete-sage`).
@@ -25,7 +27,7 @@ To add these sources to `ac-sources`, put the following lines to `"~/.emacs.d/in
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 ```
 
-# Tab Completion
+## Tab Completion
 `auto-complete-sage` replaces the default completion function of
 `sage-shell-mode` (`completion-at-point`) by `auto-complete`.
 If you want to use `completion-at-point` for the Tab completion,
@@ -36,7 +38,7 @@ put the following line to `"~/.emacs.d/init.el"`:
 ```
 
 
-# Customization
+## Customization
 To show a quick help, put the following line to `~/.emacs.d/init.el`.
 
 ```
