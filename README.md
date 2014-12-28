@@ -43,6 +43,15 @@ To show a quick help, put the following line to `~/.emacs.d/init.el`.
 (setq ac-sage-show-quick-help t)
 ```
 
+By default, quick help for an instance of
+`sage.misc.lazy_import.LazyImport` is not shown.
+To show quick help for every instances, put the following line to
+`~/.emacs.d/init.el`.
+
+```
+(setq ac-sage-quick-help-ignore-classes '(""))
+```
+
 For more customization, `M-x customize-group RET auto-complete-sage`.
 
 [melpa-link]: http://melpa.org/#/auto-complete-sage
