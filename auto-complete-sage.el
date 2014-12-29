@@ -147,7 +147,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl-methods-init ()
   (ac-sage--doc-clear-cache)
   (when (and (integerp ac-auto-start)
-             (= (- (point) (sage-shell-cpl:get 'prefix))
+             (<= (- (point) (sage-shell-cpl:get 'prefix))
                 ac-auto-start))
     (sage-shell-cpl:completion-init
      (sage-shell-cpl:get 'interface)
