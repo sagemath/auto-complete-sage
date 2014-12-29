@@ -39,7 +39,7 @@ put the following line to `"~/.emacs.d/init.el"`:
 
 
 ## Customization
-To show a quick help, put the following line to `~/.emacs.d/init.el`.
+To show a quick help, put the following line to `"~/.emacs.d/init.el"`.
 
 ```
 (setq ac-sage-show-quick-help t)
@@ -48,7 +48,7 @@ To show a quick help, put the following line to `~/.emacs.d/init.el`.
 By default, quick help for an instance of
 `sage.misc.lazy_import.LazyImport` is not shown.
 To show quick help for every instances, put the following line to
-`~/.emacs.d/init.el`.
+`"~/.emacs.d/init.el"`.
 
 ```
 (setq ac-sage-quick-help-ignore-classes '(""))
