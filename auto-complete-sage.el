@@ -69,8 +69,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                                   ac-sage-quick-help-ignore-classes ", "))
                sage-shell:init-command-list))))
 
-(add-hook 'sage-shell-mode-hook 'ac-sage-setup-internal)
-
 (defvar ac-sage--repl-methods-cached nil)
 (make-variable-buffer-local 'ac-sage--repl-methods-cached)
 
@@ -264,6 +262,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 ;;;###autoload
 (defun ac-sage-setup ()
   (interactive)
+  (ac-sage-setup-internal)
   (cond
    ((eq major-mode 'sage-shell-mode)
     (ac-sage-repl:add-sources))
