@@ -4,8 +4,8 @@
 
 ## Overview
 
-`auto-complete-sage` provides an [auto-complete](https://github.com/auto-complete/auto-complete)
- source for [sage-shell-mode](https://github.com/stakemori/sage-shell-mode).
+`auto-complete-sage` provides [auto-complete](https://github.com/auto-complete/auto-complete)
+ sources for [sage-shell-mode](https://github.com/stakemori/sage-shell-mode).
 
 ![ac-sage](images/ac-sage.gif)
 
@@ -47,7 +47,7 @@ To show a quick help, put the following line to `"~/.emacs.d/init.el"`.
 
 By default, quick help for an instance of
 `sage.misc.lazy_import.LazyImport` is not shown.
-To show quick help for every instances, put the following line to
+To show quick help for all instances, put the following line to
 `"~/.emacs.d/init.el"`.
 
 ```
