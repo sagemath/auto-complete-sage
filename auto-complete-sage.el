@@ -262,9 +262,9 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 ;;;###autoload
 (defun ac-sage-setup ()
   (interactive)
-  (ac-sage-setup-internal)
   (cond
    ((eq major-mode 'sage-shell-mode)
+    (ac-sage-setup-internal)
     (ac-sage-repl:add-sources))
    ((eq major-mode 'sage-shell:sage-mode)
     (ac-sage:add-sources))))
