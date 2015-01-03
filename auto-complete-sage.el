@@ -231,9 +231,10 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 ;; sage-edit-ac
 (defun ac-sage:add-sources ()
   (setq ac-sources
-        (append '(ac-source-sage-commands
-                  ac-source-sage-words-in-buffers)
-                ac-sources)))
+        (append
+         ac-sources
+         '(ac-source-sage-commands
+           ac-source-sage-words-in-buffers))))
 
 (defun ac-sage-commands-candidates ()
   (when (and sage-shell:process-buffer
