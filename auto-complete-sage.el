@@ -184,9 +184,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     "slice" "sorted" "staticmethod" "str" "sum" "super" "try" "tuple" "type"
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
-(defvar ac-source-sage-python-kwds
-  '((candidates . (lambda () ac-sage-repl:python-kwds))))
-
 (defun ac-sage-repl-python-kwds-candidates ()
   (when (and (string= (sage-shell-cpl:get 'interface) "sage")
              (null (sage-shell-cpl:get 'var-base-name)))
@@ -235,8 +232,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage:add-sources ()
   (setq ac-sources
         (append '(ac-source-sage-commands
-                  ac-source-sage-words-in-buffers
-                  ac-source-sage-python-kwds)
+                  ac-source-sage-words-in-buffers)
                 ac-sources)))
 
 (defun ac-sage-commands-candidates ()
