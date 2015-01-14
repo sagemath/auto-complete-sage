@@ -34,7 +34,8 @@ If you want to use `completion-at-point` for the Tab completion,
 put the following line to `"~/.emacs.d/init.el"`:
 
 ```
-(setq sage-shell:completion-function 'completion-at-point)
+(eval-after-load "auto-complete-sage"
+  '(setq sage-shell:completion-function 'completion-at-point))
 ```
 
 
