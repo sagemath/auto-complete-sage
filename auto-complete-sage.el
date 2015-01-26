@@ -1,5 +1,5 @@
 ;;; auto-complete-sage.el --- An auto-complete source for sage-shell-mode.
-;; Copyright (C) 2012-2014 Sho Takemori.
+;; Copyright (C) 2012-2015 Sho Takemori.
 
 ;; Author: Sho Takemori <stakemorii@gmail.com>
 ;; URL: https://github.com/stakemori/auto-complete-sage
