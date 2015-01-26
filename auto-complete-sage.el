@@ -73,6 +73,14 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (make-variable-buffer-local 'ac-sage--repl-methods-cached)
 
 (defvar ac-sage--sage-commands-doc-cached nil)
+(make-variable-buffer-local 'ac-sage--sage-commands-doc-cached)
+
+(defun ac-sage--sage-commands-doc-clear-cache ()
+  (sage-shell:with-current-buffer-safe sage-shell:process-buffer
+    (setq ac-sage--sage-commands-doc-cached nil)))
+
+(add-hook 'sage-shell:clear-command-cache-hook
+          'ac-sage--sage-commands-doc-clear-cache)
 
 (defun ac-sage--doc-clear-cache ()
   (sage-shell:with-current-buffer-safe sage-shell:process-buffer
