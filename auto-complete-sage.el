@@ -115,8 +115,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl-methods-doc (can)
   (when ac-sage-show-quick-help
     (let* ((base-name
-            (or (sage-shell-cpl:get 'var-base-name)
-                (sage-shell:in (sage-shell-cpl:get 'interface)
+            (or (sage-shell-cpl:get-current 'var-base-name)
+                (sage-shell:in (sage-shell-cpl:get-current 'interface)
                                sage-shell-interfaces:other-interfaces)))
            (name (sage-shell:aif base-name
                      (format "%s.%s" it can)
@@ -153,16 +153,16 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl-methods-init ()
   (ac-sage--doc-clear-cache)
   (when (and (integerp ac-auto-start)
-             (<= (- (point) (sage-shell-cpl:get 'prefix))
+             (<= (- (point) (sage-shell-cpl:get-current 'prefix))
                 ac-auto-start))
     (sage-shell-cpl:completion-init
-     (sage-shell-cpl:get 'interface)
-     (sage-shell-cpl:get 'var-base-name)
+     (sage-shell-cpl:get-current 'interface)
+     (sage-shell-cpl:get-current 'var-base-name)
      (equal this-command 'auto-complete))))
 
 (defun ac-sage-methods-prefix ()
   (let ((pfx (sage-shell-cpl:prefix)))
-    (when (and pfx (sage-shell-cpl:get 'var-base-name))
+    (when (and pfx (sage-shell-cpl:get-current 'var-base-name))
       pfx)))
 
 (defvar ac-source-sage-other-interfaces
@@ -174,7 +174,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defun ac-sage-other-int-prefix ()
   (let ((pfx (sage-shell-cpl:prefix)))
-    (when (and pfx (not (string= (sage-shell-cpl:get 'interface) "sage")))
+    (when (and pfx (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
       pfx)))
 
 (defvar ac-sage-repl:python-kwds
@@ -193,8 +193,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl-python-kwds-candidates ()
-  (when (and (string= (sage-shell-cpl:get 'interface) "sage")
-             (null (sage-shell-cpl:get 'var-base-name)))
+  (when (and (string= (sage-shell-cpl:get-current 'interface) "sage")
+             (null (sage-shell-cpl:get-current 'var-base-name)))
     ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-repl-python-kwds
@@ -226,8 +226,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl:init ()
   (when (sage-shell:output-finished-p)
     (sage-shell-cpl:completion-init
-     (sage-shell-cpl:get 'interface)
-     (sage-shell-cpl:get 'var-base-name)
+     (sage-shell-cpl:get-current 'interface)
+     (sage-shell-cpl:get-current 'var-base-name)
      (equal this-command 'auto-complete))))
 
 (defun ac-sage-repl:candidates ()
@@ -249,8 +249,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
              ;; To use source 'words-in-sage-buffers' in other intafaces
              (or (derived-mode-p 'python-mode)
                  (when (eq major-mode 'sage-shell-mode)
-                   (and (string= (sage-shell-cpl:get 'interface) "sage")
-                        (not (sage-shell-cpl:get 'var-base-name))))))
+                   (and (string= (sage-shell-cpl:get-current 'interface) "sage")
+                        (not (sage-shell-cpl:get-current 'var-base-name))))))
     (sage-shell:with-current-buffer-safe sage-shell:process-buffer
       (or (sage-shell-cpl:get-cmd-lst "sage")
           (sage-shell:update-sage-commands)))))
