@@ -156,8 +156,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
              (<= (- (point) (sage-shell-cpl:get-current 'prefix))
                 ac-auto-start))
     (sage-shell-cpl:completion-init
-     (sage-shell-cpl:get-current 'interface)
-     (sage-shell-cpl:get-current 'var-base-name)
      (equal this-command 'auto-complete))))
 
 (defun ac-sage-methods-prefix ()
@@ -226,8 +224,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl:init ()
   (when (sage-shell:output-finished-p)
     (sage-shell-cpl:completion-init
-     (sage-shell-cpl:get-current 'interface)
-     (sage-shell-cpl:get-current 'var-base-name)
      (equal this-command 'auto-complete))))
 
 (defun ac-sage-repl:candidates ()
