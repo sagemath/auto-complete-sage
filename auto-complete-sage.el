@@ -54,13 +54,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
   :type '(repeat string))
 
 (defun ac-sage-setup-internal ()
-  (when ac-sage-show-quick-help
-    (set (make-local-variable 'sage-shell:init-command-list)
-         ;; Send dummy code to import modules.
-         (cons (format "%s('%s')"
-                       (sage-shell:py-mod-func "print_short_doc_and_def")
-                       "NumberField")
-               sage-shell:init-command-list)))
   (sage-shell:awhen ac-sage-quick-help-ignore-classes
     (set (make-local-variable 'sage-shell:init-command-list)
          (cons (format "%s.ignore_classes = [%s]"
@@ -263,6 +256,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 ;;;###autoload
 (defun ac-sage-setup ()
   (interactive)
+  (unless auto-complete-mode
+    (auto-complete-mode 1))
   (cond
    ((eq major-mode 'sage-shell-mode)
     (ac-sage-setup-internal)
