@@ -164,7 +164,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     (cache)))
 
 (defun ac-sage-other-int-prefix ()
-  (let ((pfx (sage-shell-cpl:prefix)))
+  (let ((pfx (sage-shell-cpl:get-current 'prefix)))
     (when (and pfx (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
       pfx)))
 
