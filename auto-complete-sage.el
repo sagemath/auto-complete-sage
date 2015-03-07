@@ -188,8 +188,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl-python-kwds-candidates ()
-  (when (and (string= (sage-shell-cpl:get-current 'interface) "sage")
-             (null (sage-shell-cpl:get-current 'var-base-name)))
+  (when (ac-sage-use-sage-global-vars-p)
     ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-repl-python-kwds
@@ -232,13 +231,17 @@ If the value is equal to '(\"\"), then it does not ignore anything."
          '(ac-source-sage-commands
            ac-source-sage-words-in-buffers))))
 
+
+(defun ac-sage-use-sage-global-vars-p ()
+  (and (string= (sage-shell-cpl:get-current 'interface) "sage")
+       (null (sage-shell-cpl:get-current 'var-base-name))))
+
 (defun ac-sage-commands-candidates ()
   (when (and sage-shell:process-buffer
              ;; To use source 'words-in-sage-buffers' in other intafaces
              (or (derived-mode-p 'python-mode)
                  (when (eq major-mode 'sage-shell-mode)
-                   (and (string= (sage-shell-cpl:get-current 'interface) "sage")
-                        (not (sage-shell-cpl:get-current 'var-base-name))))))
+                   (ac-sage-use-sage-global-vars-p))))
     (sage-shell:with-current-buffer-safe sage-shell:process-buffer
       (or (sage-shell-cpl:get-cmd-lst "sage")
           (sage-shell:update-sage-commands)))))
