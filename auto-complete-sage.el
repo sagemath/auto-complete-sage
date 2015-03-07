@@ -103,15 +103,20 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                         ac-sage--sage-commands-doc-cached
                         4)))
 
+(defun ac-sage-repl--base-name-and-name (can)
+  (let* ((base-name
+          (or (sage-shell-cpl:get-current 'var-base-name)
+              (sage-shell:in (sage-shell-cpl:get-current 'interface)
+                             sage-shell-interfaces:other-interfaces)))
+         (name (sage-shell:aif base-name
+                   (format "%s.%s" it can)
+                 can)))
+    (cons base-name name)))
+
 (defun ac-sage-repl-methods-doc (can)
   (when ac-sage-show-quick-help
-    (let* ((base-name
-            (or (sage-shell-cpl:get-current 'var-base-name)
-                (sage-shell:in (sage-shell-cpl:get-current 'interface)
-                               sage-shell-interfaces:other-interfaces)))
-           (name (sage-shell:aif base-name
-                     (format "%s.%s" it can)
-                   can)))
+    (cl-destructuring-bind (base-name . name)
+        (ac-sage-repl--base-name-and-name can)
       (ac-sage--cache-doc ac-sage--repl-doc name base-name
                           ac-sage--repl-methods-cached))))
 
