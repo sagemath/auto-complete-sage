@@ -21,8 +21,6 @@ of `auto-complete-mode`.
 `auto-complete-sage` provides specific sources for `sage-shell-mode`.
 To add these sources to `ac-sources`, put the following lines to `"~/.emacs.d/init.el"`:
 ```lisp
-(eval-after-load "auto-complete"
-  '(setq ac-modes (append '(sage-shell-mode sage-shell:sage-mode) ac-modes)))
 (add-hook 'sage-shell:sage-mode-hook 'ac-sage-setup)
 (add-hook 'sage-shell-mode-hook 'ac-sage-setup)
 ```
