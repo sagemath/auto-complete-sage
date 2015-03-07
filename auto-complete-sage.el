@@ -135,38 +135,42 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (unless (string= doc "")
         doc))))
 
-(defvar ac-source-sage-methods
-  '((init . ac-sage-repl-methods-init)
-    (prefix . ac-sage-methods-prefix)
-    (symbol . "f")
-    (document . ac-sage-repl-methods-doc)
-    (candidates . ac-sage-repl:candidates)
-    (cache)))
+(defmacro ac-sage-repl:-init-cands (pred)
+  `(list
+    (cons 'init
+          (lambda ()
+            (sage-shell-cpl:completion-init
+             (equal this-command 'auto-complete)
+             :pred (lambda () ,pred))))
+    (cons 'candidates
+          (lambda ()
+            (when ,pred
+              (ac-sage-repl:candidates))))))
 
-(defun ac-sage-repl-methods-init ()
-  (ac-sage--doc-clear-cache)
-  (when (and (integerp ac-auto-start)
-             (<= (- (point) (sage-shell-cpl:get-current 'prefix))
-                ac-auto-start))
-    (sage-shell-cpl:completion-init
-     (equal this-command 'auto-complete))))
+(defvar ac-source-sage-methods
+  (append
+   (ac-sage-repl:-init-cands
+    (sage-shell-cpl:get-current 'var-base-name))
+   '((prefix . ac-sage-methods-prefix)
+     (symbol . "f")
+     (document . ac-sage-repl-methods-doc)
+     (cache))))
 
 (defun ac-sage-methods-prefix ()
-  (let ((pfx (sage-shell-cpl:prefix)))
-    (when (and pfx (sage-shell-cpl:get-current 'var-base-name))
-      pfx)))
+  (ac-prefix-default))
+
+(defun ac-sage-repl:other-int-prefix ()
+  (ac-prefix-default))
 
 (defvar ac-source-sage-other-interfaces
-  '((prefix . ac-sage-other-int-prefix)
-    (symbol . "f")
-    (init . ac-sage-repl:init)
-    (candidates . ac-sage-repl:candidates)
-    (cache)))
-
-(defun ac-sage-other-int-prefix ()
-  (let ((pfx (sage-shell-cpl:get-current 'prefix)))
-    (when (and pfx (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
-      pfx)))
+  (append
+   (ac-sage-repl:-init-cands
+    (not (string= (sage-shell-cpl:get-current 'interface)
+                         "sage")))
+   '((symbol . "f")
+     (init . ac-sage-repl:other-int-init)
+     (prefix. ac-sage-repl:other-int-prefix)
+     (cache))))
 
 (defvar ac-sage-repl:python-kwds
   '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
@@ -213,11 +217,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                   ac-source-repl-sage-commands
                   ac-source-sage-words-in-buffers)
                 ac-sources)))
-
-(defun ac-sage-repl:init ()
-  (when (sage-shell:output-finished-p)
-    (sage-shell-cpl:completion-init
-     (equal this-command 'auto-complete))))
 
 (defun ac-sage-repl:candidates ()
   (when (and (sage-shell:redirect-finished-p)
