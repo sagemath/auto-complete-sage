@@ -245,17 +245,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
          '(ac-source-sage-commands
            ac-source-sage-words-in-buffers))))
 
-
-(defun ac-sage-use-sage-global-vars-p ()
-  (and (string= (sage-shell-cpl:get-current 'interface) "sage")
-       (null (sage-shell-cpl:get-current 'var-base-name))))
-
 (defun ac-sage-commands-candidates ()
-  (when (and sage-shell:process-buffer
-             ;; To use source 'words-in-sage-buffers' in other intafaces
-             (or (derived-mode-p 'python-mode)
-                 (when (eq major-mode 'sage-shell-mode)
-                   (ac-sage-use-sage-global-vars-p))))
+  (when sage-shell:process-buffer
     (sage-shell:with-current-buffer-safe sage-shell:process-buffer
       (or (sage-shell-cpl:get-cmd-lst "sage")
           (sage-shell:update-sage-commands)))))
