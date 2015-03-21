@@ -138,7 +138,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (unless (string= doc "")
         doc))))
 
-(cl-defmacro ac-sage-repl:-init-cands (&key type (pred t))
+(cl-defmacro ac-sage-repl:-source-base (&key type (pred t))
   (let ((-pred  (if (eq pred t)
                     `(sage-shell:in ,type
                                     (sage-shell-cpl:get-current 'types))
@@ -158,7 +158,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-repl-sage-commands
   (append
-   (ac-sage-repl:-init-cands
+   (ac-sage-repl:-source-base
     :type "interface"
     :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
    '((document . ac-sage-repl-sage-commands-doc)
@@ -167,7 +167,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-init-cands :type "attributes")
+   (ac-sage-repl:-source-base :type "attributes")
    '((prefix . ac-sage-methods-prefix)
      (symbol . "f")
      (document . ac-sage-repl-methods-doc)
@@ -186,7 +186,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-other-interfaces
   (append
-   (ac-sage-repl:-init-cands
+   (ac-sage-repl:-source-base
     :type "interface"
     :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
    '((symbol . "f")
