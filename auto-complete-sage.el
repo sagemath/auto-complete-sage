@@ -138,26 +138,45 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (unless (string= doc "")
         doc))))
 
-(defmacro ac-sage-repl:-init-cands (pred)
-  `(list
-    (cons 'init
-          (lambda ()
-            (sage-shell-cpl:completion-init
-             (equal this-command 'auto-complete)
-             :pred (lambda () ,pred))))
-    (cons 'candidates
-          (lambda ()
-            (when ,pred
-              (ac-sage-repl:candidates))))))
+(cl-defmacro ac-sage-repl:-init-cands (&key type (pred t))
+  (let ((-pred  (if (eq pred t)
+                    `(sage-shell:in ,type
+                                    (sage-shell-cpl:get-current 'types))
+                  `(and (sage-shell:in ,type
+                                       (sage-shell-cpl:get-current 'types))
+                        ,pred))))
+    `(list
+      (cons 'init
+            (lambda ()
+              (sage-shell-cpl:completion-init
+               (equal this-command 'auto-complete)
+               :pred (lambda () ,-pred))))
+      (cons 'candidates
+            (lambda ()
+              (when ,-pred
+                (ac-sage-repl:candidates)))))))
+
+(defvar ac-source-repl-sage-commands
+  (append
+   (ac-sage-repl:-init-cands
+    :type "interface"
+    :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
+   '((document . ac-sage-repl-sage-commands-doc)
+     (symbol . "f")
+     (cache))))
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-init-cands
-    (sage-shell-cpl:get-current 'var-base-name))
+   (ac-sage-repl:-init-cands :type "attributes")
    '((prefix . ac-sage-methods-prefix)
      (symbol . "f")
      (document . ac-sage-repl-methods-doc)
      (cache))))
+
+(defun ac-sage-repl:candidates ()
+  (when (and (sage-shell:redirect-finished-p)
+             (sage-shell:output-finished-p))
+    (sage-shell-cpl:candidates)))
 
 (defun ac-sage-methods-prefix ()
   (ac-prefix-default))
@@ -168,8 +187,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-source-sage-other-interfaces
   (append
    (ac-sage-repl:-init-cands
-    (not (string= (sage-shell-cpl:get-current 'interface)
-                         "sage")))
+    :type "interface"
+    :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
    '((symbol . "f")
      (init . ac-sage-repl:other-int-init)
      (prefix. ac-sage-repl:other-int-prefix)
@@ -197,12 +216,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-source-sage-repl-python-kwds
   '((candidates . ac-sage-repl-python-kwds-candidates)))
 
-(defvar ac-source-repl-sage-commands
-  '((document . ac-sage-repl-sage-commands-doc)
-    (symbol . "f")
-    (candidates . ac-sage-commands-candidates)
-    (cache)))
-
 (defvar ac-source-sage-commands
   '((init . (lambda ()
               (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
@@ -220,10 +233,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                   ac-source-sage-words-in-buffers)
                 ac-sources)))
 
-(defun ac-sage-repl:candidates ()
-  (when (and (sage-shell:redirect-finished-p)
-             (sage-shell:output-finished-p))
-    (sage-shell-cpl:candidates)))
 
 
 ;; sage-edit-ac
