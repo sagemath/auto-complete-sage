@@ -138,7 +138,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (unless (string= doc "")
         doc))))
 
-(cl-defmacro ac-sage-repl:-source-base (&key type (pred t))
+(cl-defmacro ac-sage-repl:-source-base (&key type (pred t) (use-cache t))
   (let ((-pred  (if (eq pred t)
                     `(sage-shell:in ,type
                                     (sage-shell-cpl:get-current 'types))
@@ -148,7 +148,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     `(list
       (cons 'init
             (lambda ()
-              (sage-shell-cpl:parse-and-set-state)
+              (unless ,use-cache
+                (sage-shell-cpl:parse-and-set-state))
               (when ,-pred
                 (sage-shell-cpl:completion-init
                  (equal this-command 'auto-complete)
@@ -169,7 +170,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-source-base :type "attributes")
+   (ac-sage-repl:-source-base :type "attributes" :use-cache nil)
    '((prefix . ac-sage-methods-prefix)
      (symbol . "f")
      (document . ac-sage-repl-methods-doc))))
