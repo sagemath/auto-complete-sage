@@ -156,7 +156,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (cons 'candidates
             (lambda ()
               (when ,-pred
-                (ac-sage-repl:candidates)))))))
+                (ac-sage-repl:candidates))))
+      (cons 'cache nil))))
 
 (defvar ac-source-repl-sage-commands
   (append
@@ -164,16 +165,14 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     :type "interface"
     :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
    '((document . ac-sage-repl-sage-commands-doc)
-     (symbol . "f")
-     (cache))))
+     (symbol . "f"))))
 
 (defvar ac-source-sage-methods
   (append
    (ac-sage-repl:-source-base :type "attributes")
    '((prefix . ac-sage-methods-prefix)
      (symbol . "f")
-     (document . ac-sage-repl-methods-doc)
-     (cache))))
+     (document . ac-sage-repl-methods-doc))))
 
 (defun ac-sage-repl:candidates ()
   (when (and (sage-shell:redirect-finished-p)
@@ -193,8 +192,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
    '((symbol . "f")
      (init . ac-sage-repl:other-int-init)
-     (prefix. ac-sage-repl:other-int-prefix)
-     (cache))))
+     (prefix. ac-sage-repl:other-int-prefix))))
 
 (defvar ac-sage-repl:python-kwds
   '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
