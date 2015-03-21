@@ -210,7 +210,9 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl-python-kwds-candidates ()
-  (when (ac-sage-use-sage-global-vars-p)
+  (when (and (sage-shell:in "interface"
+                            (sage-shell-cpl:get-current 'types))
+             (string= (sage-shell-cpl:get-current 'interface) "sage"))
     ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-repl-python-kwds
