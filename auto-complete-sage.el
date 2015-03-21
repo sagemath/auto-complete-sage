@@ -193,6 +193,13 @@ If the value is equal to '(\"\"), then it does not ignore anything."
    '((symbol . "f")
      (prefix. ac-sage-repl:other-int-prefix))))
 
+(defvar ac-sage-repl-modules
+  (cons '(symbol . "m")
+        (ac-sage-repl:-source-base :type "modules")))
+
+(defvar ac-sage-repl-vars-in-module
+  (ac-sage-repl:-source-base :type "vars-in-module"))
+
 (defvar ac-sage-repl:python-kwds
   '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
     "bin" "bool" "break" "buffer" "bytearray" "callable" "chr"
@@ -228,6 +235,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
         (append '(ac-source-sage-methods
+                  ac-sage-repl-modules
+                  ac-sage-repl-vars-in-module
                   ac-source-sage-other-interfaces
                   ac-source-sage-repl-python-kwds
                   ac-source-repl-sage-commands
