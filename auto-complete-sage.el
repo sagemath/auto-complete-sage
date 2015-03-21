@@ -148,9 +148,11 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     `(list
       (cons 'init
             (lambda ()
-              (sage-shell-cpl:completion-init
-               (equal this-command 'auto-complete)
-               :pred (lambda () ,-pred))))
+              (sage-shell-cpl:parse-and-set-state)
+              (when ,-pred
+                (sage-shell-cpl:completion-init
+                 (equal this-command 'auto-complete)
+                 :compl-state sage-shell-cpl:current-state))))
       (cons 'candidates
             (lambda ()
               (when ,-pred
