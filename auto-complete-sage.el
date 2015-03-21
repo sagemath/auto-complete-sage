@@ -191,7 +191,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     :type "interface"
     :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
    '((symbol . "f")
-     (init . ac-sage-repl:other-int-init)
      (prefix. ac-sage-repl:other-int-prefix))))
 
 (defvar ac-sage-repl:python-kwds
