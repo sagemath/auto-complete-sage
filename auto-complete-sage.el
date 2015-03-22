@@ -170,7 +170,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-source-base :type "attributes")
+   (ac-sage-repl:-source-base :type "attributes" :use-cache nil)
    '((prefix . ac-sage-methods-prefix)
      (symbol . "v")
      (document . ac-sage-repl-methods-doc))))
@@ -230,8 +230,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
-        (append '(ac-sage-repl-modules
-                  ac-source-sage-methods
+        (append '(ac-source-sage-methods
+                  ac-sage-repl-modules
                   ac-sage-repl-vars-in-module
                   ac-source-sage-other-interfaces
                   ac-source-sage-repl-python-kwds
