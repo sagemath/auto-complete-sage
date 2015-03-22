@@ -51,6 +51,11 @@ If the value is equal to '(\"\"), then it does not ignore anything."
   :group 'auto-complete-sage
   :type '(repeat string))
 
+(defcustom ac-sage-complete-on-dot nil
+  "Non-nil means `auto-complete' starts when dot is inserted."
+  :group 'auto-complete-sage
+  :type 'boolean)
+
 (defun ac-sage-setup-internal ()
   (sage-shell:awhen ac-sage-quick-help-ignore-classes
     (set (make-local-variable 'sage-shell:init-command-list)
@@ -314,7 +319,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
           (ac-sage-edit:-source-base
            :type "modules" :use-cache nil
            :prefix-fun ac-sage:complete-on-dot-prefix)))
-(defvar ac-sage-complete-on-dot t)
+
 (defun ac-sage:complete-on-dot-prefix ()
   (let ((pfx (ac-prefix-default)))
     (or pfx
