@@ -185,8 +185,10 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-source-base :type "attributes")
+   (ac-sage-repl:-source-base :type "attributes"
+                              :prefix-fun ac-sage:complete-on-dot-prefix)
    '((symbol . "v")
+     (requires . 0)
      (document . ac-sage-repl-methods-doc))))
 
 (defun ac-sage-repl:candidates ()
@@ -205,8 +207,9 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-sage-repl-modules
   (append '((symbol . "m")
             (requires . 0))
-          (ac-sage-repl:-source-base :type "modules" :use-cache nil
-                                     :prefix-fun ac-sage:modules-prefix)))
+          (ac-sage-repl:-source-base
+           :type "modules" :use-cache nil
+           :prefix-fun ac-sage:complete-on-dot-prefix)))
 
 (defvar ac-sage-repl-vars-in-module
   (cons '(symbol . "v")
@@ -308,14 +311,16 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-source-sage-modules
   (append '((symbol . "m")
             (requires . 0))
-          (ac-sage-edit:-source-base :type "modules" :use-cache nil
-                                     :prefix-fun ac-sage:modules-prefix)))
-
-(defun ac-sage:modules-prefix ()
+          (ac-sage-edit:-source-base
+           :type "modules" :use-cache nil
+           :prefix-fun ac-sage:complete-on-dot-prefix)))
+(defvar ac-sage-complete-on-dot t)
+(defun ac-sage:complete-on-dot-prefix ()
   (let ((pfx (ac-prefix-default)))
     (or pfx
         ;; 46 is ?.
-        (if (= (char-before) 46)
+        (if (and ac-sage-complete-on-dot
+                 (= (char-before) 46))
             (point)))))
 
 (defvar ac-source-sage-vars-in-modules
