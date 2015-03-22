@@ -166,13 +166,13 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     :type "interface"
     :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
    '((document . ac-sage-repl-sage-commands-doc)
-     (symbol . "f"))))
+     (symbol . "v"))))
 
 (defvar ac-source-sage-methods
   (append
    (ac-sage-repl:-source-base :type "attributes")
    '((prefix . ac-sage-methods-prefix)
-     (symbol . "f")
+     (symbol . "v")
      (document . ac-sage-repl-methods-doc))))
 
 (defun ac-sage-repl:candidates ()
@@ -191,7 +191,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
    (ac-sage-repl:-source-base
     :type "interface"
     :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
-   '((symbol . "f")
+   '((symbol . "v")
      (prefix. ac-sage-repl:other-int-prefix))))
 
 (defvar ac-sage-repl-modules
