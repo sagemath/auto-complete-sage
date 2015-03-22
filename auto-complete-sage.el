@@ -170,7 +170,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-source-base :type "attributes" :use-cache nil)
+   (ac-sage-repl:-source-base :type "attributes")
    '((prefix . ac-sage-methods-prefix)
      (symbol . "f")
      (document . ac-sage-repl-methods-doc))))
@@ -195,11 +195,14 @@ If the value is equal to '(\"\"), then it does not ignore anything."
      (prefix. ac-sage-repl:other-int-prefix))))
 
 (defvar ac-sage-repl-modules
-  (cons '(symbol . "m")
-        (ac-sage-repl:-source-base :type "modules")))
+  (append (ac-sage-repl:-source-base :type "modules" :use-cache nil)
+          '((symbol . "m")
+            (prefix . ac-sage:modules-prefix)
+            (requires . 0))))
 
 (defvar ac-sage-repl-vars-in-module
-  (ac-sage-repl:-source-base :type "vars-in-module"))
+  (cons '(symbol . "v")
+        (ac-sage-repl:-source-base :type "vars-in-module")))
 
 (defvar ac-sage-repl:python-kwds
   '("abs" "all" "and" "any" "apply" "as" "assert" "basestring"
@@ -225,18 +228,10 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-source-sage-repl-python-kwds
   '((candidates . ac-sage-repl-python-kwds-candidates)))
 
-(defvar ac-source-sage-commands
-  '((init . (lambda ()
-              (sage-shell-edit:set-sage-proc-buf-internal nil nil)))
-    (document . ac-sage-doc)
-    (candidates . ac-sage-commands-candidates)
-    (symbol . "f")
-    (cache)))
-
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
-        (append '(ac-source-sage-methods
-                  ac-sage-repl-modules
+        (append '(ac-sage-repl-modules
+                  ac-source-sage-methods
                   ac-sage-repl-vars-in-module
                   ac-source-sage-other-interfaces
                   ac-source-sage-repl-python-kwds
@@ -247,18 +242,76 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 
 ;; sage-edit-ac
+(defvar ac-sage-edit:-state-cached nil)
+
+(cl-defmacro ac-sage-edit:-source-base
+    (&key type (pred t) (cache t))
+  (let* ((state-var (sage-shell:gensym))
+         (-pred  (if (eq pred t)
+                     `(sage-shell:in ,type
+                                     (sage-shell-cpl:get ,state-var 'types))
+                   `(and (sage-shell:in ,type
+                                        (sage-shell-cpl:get ,state-var 'types))
+                         ,pred)))
+         (-state (if (eq cache t)
+                     'ac-sage-edit:-state-cached
+                   '(setq ac-sage-edit:-state-cached
+                          (sage-shell-edit:parse-current-state)))))
+    `(list
+      (cons 'init
+            (lambda ()
+              (let ((,state-var ,-state))
+                (unless sage-shell:process-buffer
+                  (sage-shell-edit:set-sage-proc-buf-internal nil nil))
+                (when ,-pred
+                  (sage-shell-cpl:completion-init
+                   (equal this-command 'auto-complete)
+                   :compl-state ,state-var)))))
+      (cons 'candidates
+            (lambda ()
+              (let ((,state-var ac-sage-edit:-state-cached))
+                (when ,-pred
+                  (ac-sage-edit:candidates)))))
+      (cons 'cache nil))))
+
+(defun ac-sage-edit:candidates ()
+  (when (and sage-shell:process-buffer
+             (get-buffer sage-shell:process-buffer)
+             (sage-shell:redirect-finished-p)
+             (sage-shell:output-finished-p))
+    (sage-shell-cpl:candidates :state ac-sage-edit:-state-cached)))
+
+(defvar ac-source-sage-commands
+  (append
+   (ac-sage-edit:-source-base :type "interface")
+   '((document . ac-sage-doc)
+     (symbol . "f"))))
+
+(defvar ac-source-sage-modules
+  (append (ac-sage-edit:-source-base :type "modules" :cache nil)
+          '((symbol . "m")
+            (prefix . ac-sage:modules-prefix)
+            (requires . 0))))
+
+(defun ac-sage:modules-prefix ()
+  (let ((pfx (ac-prefix-default)))
+    (or pfx
+        ;; 46 is ?.
+        (if (= (char-before) 46)
+            (point)))))
+
+(defvar ac-source-sage-vars-in-modules
+  (cons '(symbol . "v")
+        (ac-sage-edit:-source-base :type "vars-in-module")))
+
 (defun ac-sage:add-sources ()
   (setq ac-sources
         (append
          ac-sources
-         '(ac-source-sage-commands
+         '(ac-source-sage-modules
+           ac-source-sage-vars-in-modules
+           ac-source-sage-commands
            ac-source-sage-words-in-buffers))))
-
-(defun ac-sage-commands-candidates ()
-  (when sage-shell:process-buffer
-    (sage-shell:with-current-buffer-safe sage-shell:process-buffer
-      (or (sage-shell-cpl:get-cmd-lst "sage")
-          (sage-shell:update-sage-commands)))))
 
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
