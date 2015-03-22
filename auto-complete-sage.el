@@ -288,7 +288,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                 (let ((,state-var ac-sage-edit:-state-cached))
                   (when ,-pred
                     (ac-sage-edit:candidates)))))
-        (cons 'use-cache nil)
+        (cons 'cache nil)
         (cons 'prefix ',func-name)))))
 
 (defun ac-sage-edit:candidates ()
