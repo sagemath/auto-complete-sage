@@ -303,7 +303,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
    (ac-sage-edit:-source-base :type "interface"
                               :name "sage-commands")
    '((document . ac-sage-doc)
-     (symbol . "f"))))
+     (symbol . "v"))))
 
 (defvar ac-source-sage-modules
   (append '((symbol . "m")
