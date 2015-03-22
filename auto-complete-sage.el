@@ -138,41 +138,55 @@ If the value is equal to '(\"\"), then it does not ignore anything."
       (unless (string= doc "")
         doc))))
 
-(cl-defmacro ac-sage-repl:-source-base (&key type (pred t) (use-cache t))
+(cl-defmacro ac-sage-repl:-source-base (&key type
+                                             name
+                                             (pred t) (use-cache t)
+                                             (prefix-fun 'ac-prefix-default))
   (let ((-pred  (if (eq pred t)
-                    `(sage-shell:in ,type
-                                    (sage-shell-cpl:get-current 'types))
-                  `(and (sage-shell:in ,type
-                                       (sage-shell-cpl:get-current 'types))
-                        ,pred))))
-    `(list
-      (cons 'init
-            (lambda ()
-              (unless ,use-cache
-                (sage-shell-cpl:parse-and-set-state))
-              (when ,-pred
+                    `(sage-shell:in
+                      ,type
+                      (sage-shell-cpl:get-current 'types))
+                  `(and (sage-shell:in
+                         ,type
+                         (sage-shell-cpl:get-current 'types))
+                        ,pred)))
+        (func-name (intern (concat "ac-sage-repl--"
+                                   (or name type) "-prefix"))))
+    `(progn
+       (defun ,func-name ()
+         ,(if (eq use-cache t)
+              `(when ,-pred
+                 ,(list prefix-fun))
+            `(progn
+               (sage-shell-cpl:parse-and-set-state)
+               (when ,-pred
+                 ,(list prefix-fun)))))
+       (list
+        (cons 'init
+              (lambda ()
                 (sage-shell-cpl:completion-init
                  (equal this-command 'auto-complete)
-                 :compl-state sage-shell-cpl:current-state))))
-      (cons 'candidates
-            (lambda ()
-              (when ,-pred
-                (ac-sage-repl:candidates))))
-      (cons 'cache nil))))
+                 :compl-state sage-shell-cpl:current-state)))
+        (cons 'candidates
+              (lambda ()
+                (when ,-pred
+                  (ac-sage-repl:candidates))))
+        (cons 'cache nil)
+        (cons 'prefix ',func-name)))))
 
 (defvar ac-source-repl-sage-commands
   (append
    (ac-sage-repl:-source-base
     :type "interface"
+    :name "sage-interface"
     :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
    '((document . ac-sage-repl-sage-commands-doc)
      (symbol . "v"))))
 
 (defvar ac-source-sage-methods
   (append
-   (ac-sage-repl:-source-base :type "attributes" :use-cache nil)
-   '((prefix . ac-sage-methods-prefix)
-     (symbol . "v")
+   (ac-sage-repl:-source-base :type "attributes")
+   '((symbol . "v")
      (document . ac-sage-repl-methods-doc))))
 
 (defun ac-sage-repl:candidates ()
@@ -180,25 +194,19 @@ If the value is equal to '(\"\"), then it does not ignore anything."
              (sage-shell:output-finished-p))
     (sage-shell-cpl:candidates)))
 
-(defun ac-sage-methods-prefix ()
-  (ac-prefix-default))
-
-(defun ac-sage-repl:other-int-prefix ()
-  (ac-prefix-default))
-
 (defvar ac-source-sage-other-interfaces
   (append
    (ac-sage-repl:-source-base
     :type "interface"
+    :name "other-interface"
     :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
-   '((symbol . "v")
-     (prefix. ac-sage-repl:other-int-prefix))))
+   '((symbol . "v"))))
 
 (defvar ac-sage-repl-modules
-  (append (ac-sage-repl:-source-base :type "modules" :use-cache nil)
-          '((symbol . "m")
-            (prefix . ac-sage:modules-prefix)
-            (requires . 0))))
+  (append '((symbol . "m")
+            (requires . 0))
+          (ac-sage-repl:-source-base :type "modules" :use-cache nil
+                                     :prefix-fun ac-sage:modules-prefix)))
 
 (defvar ac-sage-repl-vars-in-module
   (cons '(symbol . "v")
@@ -230,8 +238,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
-        (append '(ac-source-sage-methods
-                  ac-sage-repl-modules
+        (append '(ac-sage-repl-modules
+                  ac-source-sage-methods
                   ac-sage-repl-vars-in-module
                   ac-source-sage-other-interfaces
                   ac-source-sage-repl-python-kwds
@@ -245,7 +253,9 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-sage-edit:-state-cached nil)
 
 (cl-defmacro ac-sage-edit:-source-base
-    (&key type (pred t) (cache t))
+    (&key type
+          name
+          (pred t) (use-cache t) (prefix-fun 'ac-prefix-default))
   (let* ((state-var (sage-shell:gensym))
          (-pred  (if (eq pred t)
                      `(sage-shell:in ,type
@@ -253,26 +263,33 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                    `(and (sage-shell:in ,type
                                         (sage-shell-cpl:get ,state-var 'types))
                          ,pred)))
-         (-state (if (eq cache t)
+         (-state (if (eq use-cache t)
                      'ac-sage-edit:-state-cached
                    '(setq ac-sage-edit:-state-cached
-                          (sage-shell-edit:parse-current-state)))))
-    `(list
-      (cons 'init
-            (lambda ()
-              (let ((,state-var ,-state))
-                (unless sage-shell:process-buffer
-                  (sage-shell-edit:set-sage-proc-buf-internal nil nil))
-                (when ,-pred
+                          (sage-shell-edit:parse-current-state))))
+         (func-name (intern (concat "ac-sage-edit--"
+                                    (or name type) "-prefix"))))
+    `(progn
+       (defun ,func-name ()
+         (let ((,state-var ,-state))
+           (when ,-pred
+             ,(list prefix-fun))))
+       (list
+        (cons 'init
+              (lambda ()
+                (let ((,state-var ac-sage-edit:-state-cached))
+                  (unless sage-shell:process-buffer
+                    (sage-shell-edit:set-sage-proc-buf-internal nil nil))
                   (sage-shell-cpl:completion-init
                    (equal this-command 'auto-complete)
-                   :compl-state ,state-var)))))
-      (cons 'candidates
-            (lambda ()
-              (let ((,state-var ac-sage-edit:-state-cached))
-                (when ,-pred
-                  (ac-sage-edit:candidates)))))
-      (cons 'cache nil))))
+                   :compl-state ,state-var))))
+        (cons 'candidates
+              (lambda ()
+                (let ((,state-var ac-sage-edit:-state-cached))
+                  (when ,-pred
+                    (ac-sage-edit:candidates)))))
+        (cons 'use-cache nil)
+        (cons 'prefix ',func-name)))))
 
 (defun ac-sage-edit:candidates ()
   (when (and sage-shell:process-buffer
@@ -283,15 +300,16 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 
 (defvar ac-source-sage-commands
   (append
-   (ac-sage-edit:-source-base :type "interface")
+   (ac-sage-edit:-source-base :type "interface"
+                              :name "sage-commands")
    '((document . ac-sage-doc)
      (symbol . "f"))))
 
 (defvar ac-source-sage-modules
-  (append (ac-sage-edit:-source-base :type "modules" :cache nil)
-          '((symbol . "m")
-            (prefix . ac-sage:modules-prefix)
-            (requires . 0))))
+  (append '((symbol . "m")
+            (requires . 0))
+          (ac-sage-edit:-source-base :type "modules" :use-cache nil
+                                     :prefix-fun ac-sage:modules-prefix)))
 
 (defun ac-sage:modules-prefix ()
   (let ((pfx (ac-prefix-default)))
@@ -316,7 +334,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
    (lambda (buf)
-     (sage-shell:in (buffer-local-value 'major-mode buf) sage-shell:sage-modes))))
+     (sage-shell:in (buffer-local-value 'major-mode buf)
+                    sage-shell:sage-modes))))
 
 (defvar ac-source-sage-words-in-buffers
   '((init . ac-update-word-index)
