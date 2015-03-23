@@ -186,13 +186,13 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     :name "sage-interface"
     :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
    '((document . ac-sage-repl-sage-commands-doc)
-     (symbol . "v"))))
+     (symbol . "s"))))
 
 (defvar ac-source-sage-methods
   (append
    (ac-sage-repl:-source-base :type "attributes"
                               :prefix-fun ac-sage:complete-on-dot-prefix)
-   '((symbol . "v")
+   '((symbol . "s")
      (requires . 0)
      (document . ac-sage-repl-methods-doc))))
 
@@ -207,7 +207,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     :type "interface"
     :name "other-interface"
     :pred (not (string= (sage-shell-cpl:get-current 'interface) "sage")))
-   '((symbol . "v"))))
+   '((symbol . "s"))))
 
 (defvar ac-sage-repl-modules
   (append '((symbol . "m")
@@ -217,7 +217,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
            :prefix-fun ac-sage:complete-on-dot-prefix)))
 
 (defvar ac-sage-repl-vars-in-module
-  (cons '(symbol . "v")
+  (cons '(symbol . "s")
         (ac-sage-repl:-source-base :type "vars-in-module")))
 
 (defvar ac-sage-repl:python-kwds
@@ -311,7 +311,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
    (ac-sage-edit:-source-base :type "interface"
                               :name "sage-commands")
    '((document . ac-sage-doc)
-     (symbol . "v"))))
+     (symbol . "s"))))
 
 (defvar ac-source-sage-modules
   (append '((symbol . "m")
@@ -329,7 +329,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
             (point)))))
 
 (defvar ac-source-sage-vars-in-modules
-  (cons '(symbol . "v")
+  (cons '(symbol . "s")
         (ac-sage-edit:-source-base :type "vars-in-module")))
 
 (defun ac-sage:add-sources ()
