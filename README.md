@@ -38,20 +38,24 @@ put the following line to `"~/.emacs.d/init.el"`:
 
 
 ## Customization
-To show a quick help, put the following line to `"~/.emacs.d/init.el"`.
 
-```
-(setq ac-sage-show-quick-help t)
-```
+* `ac-sage-show-quick-help` (default value: `nil`).
+  To show a quick help, set this variable to `non-nil`.
+  ```
+  (setq ac-sage-show-quick-help t)
+  ```
+  By default, quick help for an instance of
+  `sage.misc.lazy_import.LazyImport` is not shown.
+  To show quick help for all instances, put the following line to
+  `"~/.emacs.d/init.el"`.
+  ```
+  (setq ac-sage-quick-help-ignore-classes '(""))
+  ```
 
-By default, quick help for an instance of
-`sage.misc.lazy_import.LazyImport` is not shown.
-To show quick help for all instances, put the following line to
-`"~/.emacs.d/init.el"`.
-
-```
-(setq ac-sage-quick-help-ignore-classes '(""))
-```
+* `ac-sage-complete-on-dot` (default value: `nil`).
+  This variable is similar to `jedi:complete-on-dot` in
+  [jedi](https://github.com/tkf/emacs-jedi).
+  When `non-nil`, `auto-complete` starts when a dot is inserted.
 
 For more customization, `M-x customize-group RET auto-complete-sage`.
 
