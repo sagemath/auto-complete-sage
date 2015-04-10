@@ -175,7 +175,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
         (cons 'candidates
               (lambda ()
                 (when ,-pred
-                  (ac-sage-repl:candidates))))
+                  (ac-sage-repl:candidates (list ,type)))))
         (cons 'cache nil)
         (cons 'prefix ',func-name)))))
 
@@ -196,10 +196,10 @@ If the value is equal to '(\"\"), then it does not ignore anything."
      (requires . 0)
      (document . ac-sage-repl-methods-doc))))
 
-(defun ac-sage-repl:candidates ()
+(defun ac-sage-repl:candidates (keys)
   (when (and (sage-shell:redirect-finished-p)
              (sage-shell:output-finished-p))
-    (sage-shell-cpl:candidates)))
+    (sage-shell-cpl:candidates :keys keys)))
 
 (defvar ac-source-sage-other-interfaces
   (append
