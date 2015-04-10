@@ -45,27 +45,13 @@
   :group 'auto-complete-sage
   :type 'boolean)
 
-(defcustom ac-sage-quick-help-ignore-classes nil
-  "If non-nil, this should be a list of strings.
-Each string shoud be a class of Sage. When non-nil instances or methods
-of these classes are ignored by `ac-quick-help'.
-If the value is equal to '(\"\"), then it does not ignore anything."
-  :group 'auto-complete-sage
-  :type '(repeat string))
+(defvaralias 'ac-sage-quick-help-ignore-classes
+  'sage-shell:inspect-ingnore-classes)
 
 (defcustom ac-sage-complete-on-dot nil
   "Non-nil means `auto-complete' starts when dot is inserted."
   :group 'auto-complete-sage
   :type 'boolean)
-
-(defun ac-sage-setup-internal ()
-  (sage-shell:awhen ac-sage-quick-help-ignore-classes
-    (set (make-local-variable 'sage-shell:init-command-list)
-         (cons (format "%s.ignore_classes = [%s]"
-                       sage-shell:python-module
-                       (mapconcat 'identity
-                                  ac-sage-quick-help-ignore-classes ", "))
-               sage-shell:init-command-list))))
 
 (defvar ac-sage--repl-methods-cached nil)
 (make-variable-buffer-local 'ac-sage--repl-methods-cached)
@@ -366,7 +352,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     (auto-complete-mode 1))
   (cond
    ((eq major-mode 'sage-shell-mode)
-    (ac-sage-setup-internal)
     (ac-sage-repl:add-sources))
    ((eq major-mode 'sage-shell:sage-mode)
     (ac-sage:add-sources))))
