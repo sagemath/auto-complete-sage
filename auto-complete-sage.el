@@ -33,6 +33,8 @@
 (setq sage-shell:completion-function 'auto-complete)
 (add-to-list 'ac-modes 'sage-shell-mode)
 (add-to-list 'ac-modes 'sage-shell:sage-mode)
+(when (fboundp #'eldoc-add-command)
+  (eldoc-add-command #'ac-complete))
 
 (defgroup auto-complete-sage nil "Group for auto-compete-sage"
   :group 'sage-shell)
