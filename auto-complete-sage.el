@@ -244,12 +244,18 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defvar ac-source-sage-repl-python-kwds
   '((candidates . ac-sage-repl-python-kwds-candidates)))
 
+(defvar as-source-sage-repl-argspec
+  (ac-sage-repl:-source-base
+   :type "in-function-call"
+   :name "argspec"))
+
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
         (append '(ac-sage-repl-modules
                   ac-source-sage-methods
                   ac-sage-repl-vars-in-module
                   ac-source-sage-other-interfaces
+                  as-source-sage-repl-argspec
                   ac-source-sage-repl-python-kwds
                   ac-source-repl-sage-commands
                   ac-source-sage-words-in-buffers)
