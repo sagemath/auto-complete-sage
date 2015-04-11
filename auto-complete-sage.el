@@ -185,9 +185,7 @@
      (document . ac-sage-repl-methods-doc))))
 
 (defun ac-sage-repl:candidates (keys)
-  (when (and (sage-shell:redirect-finished-p)
-             (sage-shell:output-finished-p))
-    (sage-shell-cpl:candidates :keys keys)))
+  (sage-shell-cpl:candidates :keys keys))
 
 (defvar ac-source-sage-other-interfaces
   (append
