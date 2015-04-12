@@ -5,7 +5,7 @@
 ;; URL: https://github.com/stakemori/auto-complete-sage
 ;; Keywords: Sage, math, auto-complete
 ;; Version: 0.0.3
-;; Package-Requires: ((auto-complete "1.4.0") (sage-shell-mode "0.0.7"))
+;; Package-Requires: ((auto-complete "1.5.0") (sage-shell-mode "0.0.7"))
 
 ;;; License
 ;; This program is free software; you can redistribute it and/or modify
