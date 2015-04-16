@@ -256,7 +256,7 @@
     (&key type
           name
           (pred t) (use-cache t) (prefix-fun 'ac-prefix-default))
-  (let* ((state-var (sage-shell:gensym))
+  (let* ((state-var (cl-gensym))
          (-pred  (if (eq pred t)
                      `(member ,type
                               (sage-shell-cpl:get ,state-var 'types))
