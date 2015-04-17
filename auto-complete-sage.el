@@ -120,7 +120,7 @@
 (defun ac-sage--doc (name base-name)
   (when (and (sage-shell:output-finished-p)
              (sage-shell:redirect-finished-p))
-    (let ((doc (sage-shell:trim-left
+    (let ((doc (sage-shell:trim-right
                 (sage-shell:send-command-to-string
                  (format "%s('%s'%s)"
                          (sage-shell:py-mod-func "print_short_doc_and_def")
