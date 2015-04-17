@@ -1,6 +1,8 @@
 # auto-complete-sage
 
-[![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
+[![melpa badge][melpa-badge]][melpa-link]
+[![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
+[![Build Status](https://travis-ci.org/stakemori/auto-complete-sage.svg)](https://travis-ci.org/stakemori/auto-complete-sage)
 
 ## Overview
 
