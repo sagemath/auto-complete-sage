@@ -9,6 +9,6 @@ compile:
 test: compile
 
 clean:
-	rm -f sage-shell-mode.elc
+	rm -f auto-complete-sage.elc
 
 .PHONY: compile test clean
