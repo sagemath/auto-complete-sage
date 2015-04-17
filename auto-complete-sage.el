@@ -4,8 +4,8 @@
 ;; Author: Sho Takemori <stakemorii@gmail.com>
 ;; URL: https://github.com/stakemori/auto-complete-sage
 ;; Keywords: Sage, math, auto-complete
-;; Version: 0.0.3
-;; Package-Requires: ((auto-complete "1.4.0") (sage-shell-mode "0.0.6"))
+;; Version: 0.0.4
+;; Package-Requires: ((auto-complete "1.5.0") (sage-shell-mode "0.0.8"))
 
 ;;; License
 ;; This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,8 @@
 (setq sage-shell:completion-function 'auto-complete)
 (add-to-list 'ac-modes 'sage-shell-mode)
 (add-to-list 'ac-modes 'sage-shell:sage-mode)
+(when (fboundp #'eldoc-add-command)
+  (eldoc-add-command #'ac-complete #'ac-expand))
 
 (defgroup auto-complete-sage nil "Group for auto-compete-sage"
   :group 'sage-shell)
@@ -43,27 +45,13 @@
   :group 'auto-complete-sage
   :type 'boolean)
 
-(defcustom ac-sage-quick-help-ignore-classes nil
-  "If non-nil, this should be a list of strings.
-Each string shoud be a class of Sage. When non-nil instances or methods
-of these classes are ignored by `ac-quick-help'.
-If the value is equal to '(\"\"), then it does not ignore anything."
-  :group 'auto-complete-sage
-  :type '(repeat string))
+(defvaralias 'ac-sage-quick-help-ignore-classes
+  'sage-shell:inspect-ingnore-classes)
 
 (defcustom ac-sage-complete-on-dot nil
   "Non-nil means `auto-complete' starts when dot is inserted."
   :group 'auto-complete-sage
   :type 'boolean)
-
-(defun ac-sage-setup-internal ()
-  (sage-shell:awhen ac-sage-quick-help-ignore-classes
-    (set (make-local-variable 'sage-shell:init-command-list)
-         (cons (format "%s.ignore_classes = [%s]"
-                       sage-shell:python-module
-                       (mapconcat 'identity
-                                  ac-sage-quick-help-ignore-classes ", "))
-               sage-shell:init-command-list))))
 
 (defvar ac-sage--repl-methods-cached nil)
 (make-variable-buffer-local 'ac-sage--repl-methods-cached)
@@ -111,8 +99,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage-repl--base-name-and-name (can)
   (let* ((base-name
           (or (sage-shell-cpl:get-current 'var-base-name)
-              (sage-shell:in (sage-shell-cpl:get-current 'interface)
-                             sage-shell-interfaces:other-interfaces)))
+              (member (sage-shell-cpl:get-current 'interface)
+                      sage-shell-interfaces:other-interfaces)))
          (name (sage-shell:aif base-name
                    (format "%s.%s" it can)
                  can)))
@@ -132,7 +120,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage--doc (name base-name)
   (when (and (sage-shell:output-finished-p)
              (sage-shell:redirect-finished-p))
-    (let ((doc (sage-shell:trim-left
+    (let ((doc (sage-shell:trim-right
                 (sage-shell:send-command-to-string
                  (format "%s('%s'%s)"
                          (sage-shell:py-mod-func "print_short_doc_and_def")
@@ -148,10 +136,10 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                                              (pred t) (use-cache t)
                                              (prefix-fun 'ac-prefix-default))
   (let ((-pred  (if (eq pred t)
-                    `(sage-shell:in
+                    `(member
                       ,type
                       (sage-shell-cpl:get-current 'types))
-                  `(and (sage-shell:in
+                  `(and (member
                          ,type
                          (sage-shell-cpl:get-current 'types))
                         ,pred)))
@@ -175,7 +163,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
         (cons 'candidates
               (lambda ()
                 (when ,-pred
-                  (ac-sage-repl:candidates))))
+                  (ac-sage-repl:candidates (list ,type)))))
         (cons 'cache nil)
         (cons 'prefix ',func-name)))))
 
@@ -196,10 +184,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
      (requires . 0)
      (document . ac-sage-repl-methods-doc))))
 
-(defun ac-sage-repl:candidates ()
-  (when (and (sage-shell:redirect-finished-p)
-             (sage-shell:output-finished-p))
-    (sage-shell-cpl:candidates)))
+(defun ac-sage-repl:candidates (keys)
+  (sage-shell-cpl:candidates :keys keys))
 
 (defvar ac-source-sage-other-interfaces
   (append
@@ -236,13 +222,18 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl-python-kwds-candidates ()
-  (when (and (sage-shell:in "interface"
-                            (sage-shell-cpl:get-current 'types))
+  (when (and (member "interface"
+                     (sage-shell-cpl:get-current 'types))
              (string= (sage-shell-cpl:get-current 'interface) "sage"))
     ac-sage-repl:python-kwds))
 
 (defvar ac-source-sage-repl-python-kwds
   '((candidates . ac-sage-repl-python-kwds-candidates)))
+
+(defvar as-source-sage-repl-argspec
+  (ac-sage-repl:-source-base
+   :type "in-function-call"
+   :name "argspec"))
 
 (defun ac-sage-repl:add-sources ()
   (setq ac-sources
@@ -250,6 +241,7 @@ If the value is equal to '(\"\"), then it does not ignore anything."
                   ac-source-sage-methods
                   ac-sage-repl-vars-in-module
                   ac-source-sage-other-interfaces
+                  as-source-sage-repl-argspec
                   ac-source-sage-repl-python-kwds
                   ac-source-repl-sage-commands
                   ac-source-sage-words-in-buffers)
@@ -266,10 +258,10 @@ If the value is equal to '(\"\"), then it does not ignore anything."
           (pred t) (use-cache t) (prefix-fun 'ac-prefix-default))
   (let* ((state-var (sage-shell:gensym))
          (-pred  (if (eq pred t)
-                     `(sage-shell:in ,type
-                                     (sage-shell-cpl:get ,state-var 'types))
-                   `(and (sage-shell:in ,type
-                                        (sage-shell-cpl:get ,state-var 'types))
+                     `(member ,type
+                              (sage-shell-cpl:get ,state-var 'types))
+                   `(and (member ,type
+                                 (sage-shell-cpl:get ,state-var 'types))
                          ,pred)))
          (-state (if (eq use-cache t)
                      'ac-sage-edit:-state-cached
@@ -344,8 +336,8 @@ If the value is equal to '(\"\"), then it does not ignore anything."
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
    (lambda (buf)
-     (sage-shell:in (buffer-local-value 'major-mode buf)
-                    sage-shell:sage-modes))))
+     (member (buffer-local-value 'major-mode buf)
+             sage-shell:sage-modes))))
 
 (defvar ac-source-sage-words-in-buffers
   '((init . ac-update-word-index)
@@ -358,7 +350,6 @@ If the value is equal to '(\"\"), then it does not ignore anything."
     (auto-complete-mode 1))
   (cond
    ((eq major-mode 'sage-shell-mode)
-    (ac-sage-setup-internal)
     (ac-sage-repl:add-sources))
    ((eq major-mode 'sage-shell:sage-mode)
     (ac-sage:add-sources))))
