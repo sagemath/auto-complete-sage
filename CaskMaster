@@ -1,6 +1,0 @@
-;; -*- mode: emacs-lisp -*-
-
-(source melpa)
-(package-file "auto-complete-sage.el")
-(depends-on "sage-shell-mode")
-(depends-on "auto-complete")
