@@ -100,7 +100,7 @@
   (let* ((base-name
           (or (sage-shell-cpl:get-current 'var-base-name)
               (sage-shell:in (sage-shell-cpl:get-current 'interface)
-                      sage-shell-interfaces:other-interfaces)))
+                             sage-shell-interfaces:other-interfaces)))
          (name (sage-shell:aif base-name
                    (format "%s.%s" it can)
                  can)))
@@ -223,7 +223,7 @@
 
 (defun ac-sage-repl-python-kwds-candidates ()
   (when (and (sage-shell:in "interface"
-                     (sage-shell-cpl:get-current 'types))
+                            (sage-shell-cpl:get-current 'types))
              (string= (sage-shell-cpl:get-current 'interface) "sage"))
     ac-sage-repl:python-kwds))
 
@@ -259,9 +259,9 @@
   (let* ((state-var (sage-shell:gensym))
          (-pred  (if (eq pred t)
                      `(sage-shell:in ,type
-                              (sage-shell-cpl:get ,state-var 'types))
+                                     (sage-shell-cpl:get ,state-var 'types))
                    `(and (sage-shell:in ,type
-                                 (sage-shell-cpl:get ,state-var 'types))
+                                        (sage-shell-cpl:get ,state-var 'types))
                          ,pred)))
          (-state (if (eq use-cache t)
                      'ac-sage-edit:-state-cached
@@ -337,7 +337,7 @@
   (ac-word-candidates
    (lambda (buf)
      (sage-shell:in (buffer-local-value 'major-mode buf)
-             sage-shell:sage-modes))))
+                    sage-shell:sage-modes))))
 
 (defvar ac-source-sage-words-in-buffers
   '((init . ac-update-word-index)
