@@ -99,7 +99,7 @@
 (defun ac-sage-repl--base-name-and-name (can)
   (let* ((base-name
           (or (sage-shell-cpl:get-current 'var-base-name)
-              (member (sage-shell-cpl:get-current 'interface)
+              (sage-shell:in (sage-shell-cpl:get-current 'interface)
                       sage-shell-interfaces:other-interfaces)))
          (name (sage-shell:aif base-name
                    (format "%s.%s" it can)
@@ -136,10 +136,10 @@
                                              (pred t) (use-cache t)
                                              (prefix-fun 'ac-prefix-default))
   (let ((-pred  (if (eq pred t)
-                    `(member
+                    `(sage-shell:in
                       ,type
                       (sage-shell-cpl:get-current 'types))
-                  `(and (member
+                  `(and (sage-shell:in
                          ,type
                          (sage-shell-cpl:get-current 'types))
                         ,pred)))
@@ -222,7 +222,7 @@
     "unichr" "unicode" "vars" "while" "with" "xrange" "yield" "zip" "__import__"))
 
 (defun ac-sage-repl-python-kwds-candidates ()
-  (when (and (member "interface"
+  (when (and (sage-shell:in "interface"
                      (sage-shell-cpl:get-current 'types))
              (string= (sage-shell-cpl:get-current 'interface) "sage"))
     ac-sage-repl:python-kwds))
@@ -258,9 +258,9 @@
           (pred t) (use-cache t) (prefix-fun 'ac-prefix-default))
   (let* ((state-var (sage-shell:gensym))
          (-pred  (if (eq pred t)
-                     `(member ,type
+                     `(sage-shell:in ,type
                               (sage-shell-cpl:get ,state-var 'types))
-                   `(and (member ,type
+                   `(and (sage-shell:in ,type
                                  (sage-shell-cpl:get ,state-var 'types))
                          ,pred)))
          (-state (if (eq use-cache t)
@@ -336,7 +336,7 @@
 (defun ac-sage:words-in-sage-buffers ()
   (ac-word-candidates
    (lambda (buf)
-     (member (buffer-local-value 'major-mode buf)
+     (sage-shell:in (buffer-local-value 'major-mode buf)
              sage-shell:sage-modes))))
 
 (defvar ac-source-sage-words-in-buffers
