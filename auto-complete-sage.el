@@ -135,6 +135,7 @@
                                              name
                                              (pred t) (use-cache t)
                                              (prefix-fun 'ac-prefix-default))
+  ;; If the current state is nil, then -pred returns nil.
   (let ((-pred  (if (eq pred t)
                     `(sage-shell:in
                       ,type
