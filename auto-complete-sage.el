@@ -135,8 +135,8 @@
                                              name
                                              (pred t) (use-cache t)
                                              (prefix-fun 'ac-prefix-default))
-  ;; If the current state is nil, then -pred returns nil.
-  (let ((-pred  (if (eq pred t)
+  ;; If the current state is nil, then pred1 returns nil.
+  (let ((pred1  (if (eq pred t)
                     `(sage-shell:in
                       ,type
                       (sage-shell-cpl:get-current 'types))
@@ -149,11 +149,11 @@
     `(progn
        (defun ,func-name ()
          ,(if (eq use-cache t)
-              `(when ,-pred
+              `(when ,pred1
                  ,(list prefix-fun))
             `(progn
                (sage-shell-cpl:parse-and-set-state)
-               (when ,-pred
+               (when ,pred1
                  ,(list prefix-fun)))))
        (list
         (cons 'init
@@ -163,7 +163,7 @@
                  :compl-state sage-shell-cpl:current-state)))
         (cons 'candidates
               (lambda ()
-                (when ,-pred
+                (when ,pred1
                   (ac-sage-repl:candidates (list ,type)))))
         (cons 'cache nil)
         (cons 'prefix ',func-name)))))
