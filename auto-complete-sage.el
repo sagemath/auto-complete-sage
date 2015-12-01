@@ -77,23 +77,18 @@
      (sage-shell:aif (and (> (length ,name) ,min-len)
                           (assoc-default ,name ,cache-var))
          it
-       (let ((doc (,doc-func ,name ,base-name)))
-         (prog1
-             doc
-           (setq ,cache-var
-                 (cons (cons ,name doc) ,cache-var)))))))
+       (when (sage-shell:at-top-level-and-in-sage-p)
+         (let ((doc (,doc-func ,name ,base-name)))
+           (prog1
+               doc
+             (setq ,cache-var
+                   (cons (cons ,name doc) ,cache-var))))))))
 
 (defun ac-sage-doc (can)
   (when ac-sage-show-quick-help
     (ac-sage--cache-doc ac-sage--doc can nil
                         ac-sage--sage-commands-doc-cached
                         ;; Short names may be re-defined.
-                        4)))
-
-(defun ac-sage-repl-sage-commands-doc (can)
-  (when ac-sage-show-quick-help
-    (ac-sage--cache-doc ac-sage--repl-doc can nil
-                        ac-sage--sage-commands-doc-cached
                         4)))
 
 (defun ac-sage-repl--base-name-and-name (can)
@@ -110,12 +105,8 @@
   (when ac-sage-show-quick-help
     (cl-destructuring-bind (base-name . name)
         (ac-sage-repl--base-name-and-name can)
-      (ac-sage--cache-doc ac-sage--repl-doc name base-name
+      (ac-sage--cache-doc ac-sage--doc name base-name
                           ac-sage--repl-methods-cached))))
-
-(defun ac-sage--repl-doc (name base-name)
-  (when (sage-shell:at-top-level-and-in-sage-p)
-    (ac-sage--doc name base-name)))
 
 (defun ac-sage--doc (name base-name)
   (when (and (sage-shell:output-finished-p)
@@ -174,7 +165,7 @@
     :type "interface"
     :name "sage-interface"
     :pred (string= (sage-shell-cpl:get-current 'interface) "sage"))
-   '((document . ac-sage-repl-sage-commands-doc)
+   '((document . ac-sage-doc)
      (symbol . "s"))))
 
 (defvar ac-source-sage-methods
