@@ -1,11 +1,11 @@
 ;;; auto-complete-sage.el --- An auto-complete source for sage-shell-mode.
-;; Copyright (C) 2012-2015 Sho Takemori.
+;; Copyright (C) 2012-2016 Sho Takemori.
 
 ;; Author: Sho Takemori <stakemorii@gmail.com>
 ;; URL: https://github.com/stakemori/auto-complete-sage
 ;; Keywords: Sage, math, auto-complete
 ;; Version: 0.0.4
-;; Package-Requires: ((auto-complete "1.5.0") (sage-shell-mode "0.0.8"))
+;; Package-Requires: ((auto-complete "1.5.1") (sage-shell-mode "0.1.0"))
 
 ;;; License
 ;; This program is free software; you can redistribute it and/or modify
